@@ -1,0 +1,10 @@
+.hover--brighten {
+  transition: filter animTime(0.5s) ease-in-out;
+  &:hover {
+    filter: brightness(105%);
+  }
+}
+
+.cursor--pointer {
+  cursor: pointer;
+}
