@@ -11,6 +11,7 @@
   "dependencies": {
     "axios": "^0.21.0",
     "json2mq": "^0.2.0",
+    "mp3-mediarecorder": "^4.0.5",
     "vue": "^3.0.0",
     "vue-router": "^4.0.0-0",
     "vuex": "^4.0.0-0"
@@ -38,6 +39,7 @@
     "node-sass": "^5.0.0",
     "prettier": "^2.2.0",
     "sass-loader": "^10.1.0",
-    "typescript": "~4.1.2"
+    "typescript": "~4.1.2",
+    "worker-loader": "^3.0.8"
   }
 }

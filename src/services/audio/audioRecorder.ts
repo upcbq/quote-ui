@@ -1,17 +1,19 @@
 import { ref } from 'vue';
 import { AudioPlayback } from './audioPlayback';
+import { Mp3MediaRecorder } from 'mp3-mediarecorder';
+import Mp3RecorderWorker from 'worker-loader!./audioRecorder.worker';
 
 export class AudioRecorder {
-  private mediaRecorder: MediaRecorder;
+  private mediaRecorder: Mp3MediaRecorder;
   private currentRecording: Blob[];
   public isRecording = ref<boolean>(false);
 
   private constructor(stream: MediaStream) {
-    this.mediaRecorder = new MediaRecorder(stream);
+    this.mediaRecorder = new Mp3MediaRecorder(stream, { worker: Mp3RecorderWorker() });
     this.currentRecording = [];
 
     this.mediaRecorder.addEventListener('dataavailable', (ev) => {
-      this.currentRecording.push(ev.data);
+      this.currentRecording.push(((ev as unknown) as { data: Blob }).data);
     });
   }
 
@@ -38,7 +40,7 @@ export class AudioRecorder {
   public async stop(): Promise<{ blob: Blob; url: string; audio: AudioPlayback }> {
     return new Promise((resolve) => {
       this.mediaRecorder.addEventListener('stop', () => {
-        const blob = new Blob(this.currentRecording);
+        const blob = new Blob(this.currentRecording, { type: 'audio/mp3' });
         const url = URL.createObjectURL(blob);
         const audio = new Audio(url);
 
