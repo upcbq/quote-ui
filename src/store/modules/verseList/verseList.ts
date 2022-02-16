@@ -12,7 +12,7 @@ export const VerseListStoreState: () => VerseListState = () => ({
 export const VerseListStoreMutations = {};
 
 export const VerseListStoreActions = {
-  async fetchToken({ state }: ActionContext<VerseListState, RootState>) {
+  async fetchVerseLists({ state }: ActionContext<VerseListState, RootState>) {
     const requestHelper = new RequestHelper<VerseListLimitedResponse[]>();
     const promise = requestHelper.start(bqQuoteApi.verseList.getVerseLists());
     const response = await promise;

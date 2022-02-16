@@ -1,3 +1,5 @@
+import { IReference } from '@/api/types';
+
 export interface VerseListLimitedResponse {
   name: string;
   year: number;
@@ -5,4 +7,8 @@ export interface VerseListLimitedResponse {
   organization: string;
   division: string;
   translation: string;
+}
+
+export interface VerseListResponse extends VerseListLimitedResponse {
+  verses: IReference[];
 }

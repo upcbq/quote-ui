@@ -1,17 +1,22 @@
 <template>
   <div class="qa-home">
-    <Record></Record>
+    <SessionSetup />
   </div>
 </template>
 
 <script lang="ts">
 import { defineComponent } from 'vue';
-import Record from '@/components/Record/Record.vue';
+import SessionSetup from '@/components/SessionSetup.vue';
 
 export default defineComponent({
   name: 'HomeView',
   components: {
-    Record,
+    SessionSetup,
   },
 });
 </script>
+
+<style lang="scss">
+.qa-home {
+}
+</style>

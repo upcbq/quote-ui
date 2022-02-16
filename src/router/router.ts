@@ -11,6 +11,14 @@ export const routes: Array<RouteRecordRaw> = [
       layout: 'empty',
     },
   },
+  {
+    path: '/record',
+    name: 'Record',
+    component: () => import(/* webpackChunkName: "record" */ '@/components/Record.vue'),
+    meta: {
+      layout: 'empty',
+    },
+  },
 ];
 
 const router = createRouter({
