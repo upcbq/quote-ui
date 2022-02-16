@@ -13,8 +13,8 @@ export class BqQuoteApi {
 }
 
 export const bqQuoteApi = new BqQuoteApi({
-  verse: 'http://localhost:3000/v1',
-  verseList: 'http://localhost:3001/v1',
+  verse: process.env?.VUE_APP_VERSE_API_URL,
+  verseList: process.env?.VUE_APP_VERSE_LIST_API_URL,
 });
 
 // bqQuoteApi.axiosInstance.interceptors.request.use((config) => {
