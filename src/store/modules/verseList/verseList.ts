@@ -1,5 +1,8 @@
 import { bqQuoteApi } from '@/api/api';
-import { VerseListLimitedResponse } from '@/api/modules/verseList/verseListApi.interfaces';
+import {
+  VerseListLimitedResponse,
+  VerseListResponse,
+} from '@/api/modules/verseList/verseListApi.interfaces';
 import { RootState } from '@/store/store.interfaces';
 import { RequestHelper } from '@/types/RequestState';
 import { ActionContext, Module } from 'vuex';
@@ -7,6 +10,7 @@ import { VerseListState } from './verseList.interfaces';
 
 export const VerseListStoreState: () => VerseListState = () => ({
   verseLists: [],
+  verseListCache: {},
 });
 
 export const VerseListStoreMutations = {};
@@ -18,6 +22,17 @@ export const VerseListStoreActions = {
     const response = await promise;
     if (response.success) {
       state.verseLists = response.data;
+    }
+  },
+  async fetchVerseList(
+    { state }: ActionContext<VerseListState, RootState>,
+    verseListId: string
+  ) {
+    const requestHelper = new RequestHelper<VerseListResponse>();
+    const promise = requestHelper.start(bqQuoteApi.verseList.getVerseList(verseListId));
+    const response = await promise;
+    if (response.success) {
+      state.verseListCache[verseListId] = response.data;
     }
   },
 };

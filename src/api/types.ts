@@ -14,7 +14,5 @@ export interface IReference {
   verse: number;
 }
 
-export interface IVerseList {}
-
 export type BqApiModule = 'verse' | 'verseList';
 export type BqApiConfigMap = Record<BqApiModule, string>;

@@ -1,4 +1,7 @@
-import { VerseListLimitedResponse } from '@/api/modules/verseList/verseListApi.interfaces';
+import {
+  VerseListLimitedResponse,
+  VerseListResponse,
+} from '@/api/modules/verseList/verseListApi.interfaces';
 import { CommitOptions, DispatchOptions, Store as VuexStore } from 'vuex';
 import {
   VerseListStoreActions,
@@ -8,6 +11,7 @@ import {
 
 export interface VerseListState {
   verseLists: VerseListLimitedResponse[];
+  verseListCache: Record<string, VerseListResponse>;
 }
 
 type VerseListNamespace<N extends string> = `verseList/${N}`;
