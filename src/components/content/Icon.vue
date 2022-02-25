@@ -1,5 +1,5 @@
 <template>
-  <span class="material-icons" :style="{ color: color }">{{ name }}</span>
+  <span class="material-icons qa-icon">{{ name }}</span>
 </template>
 
 <script lang="ts">
@@ -12,10 +12,15 @@ export default defineComponent({
       type: String,
       default: '',
     },
-    color: {
-      type: String,
-      default: '#000',
-    },
   },
 });
 </script>
+
+<style lang="scss">
+.qa-icon {
+  max-width: 1em;
+  overflow: hidden;
+  font-size: inherit;
+  display: block;
+}
+</style>
