@@ -1,5 +1,12 @@
 <template>
   <Card :elevation="4" class="qa-session-setup">
+    <Button
+      class="qa-ss-back-button"
+      v-if="state !== 'selectVerseList'"
+      @click.prevent="state = 'selectVerseList'"
+    >
+      <Icon name="arrow_back"></Icon>
+    </Button>
     <h2 class="font-h-2 text-left qa-ss-title">Session Setup</h2>
     <SelectVerseList v-if="state === 'selectVerseList'" @select="selectVerseList" />
     <SelectVerseRange v-else />
@@ -13,6 +20,8 @@ import SelectVerseRange from '@/components/molecules/SelectVerseRange.vue';
 import Card from '@/components/content/Card.vue';
 import { VerseListLimitedResponse } from '@/api/modules/verseList/verseListApi.interfaces';
 import { useStore } from '@/store/store';
+import Button from '../form/Button.vue';
+import Icon from '../content/Icon.vue';
 
 export default defineComponent({
   name: 'SessionSetup',
@@ -31,6 +40,8 @@ export default defineComponent({
     SelectVerseList,
     Card,
     SelectVerseRange,
+    Button,
+    Icon,
   },
 });
 </script>
@@ -40,8 +51,23 @@ export default defineComponent({
   width: calc(100% - 40px);
   box-sizing: border-box;
   max-width: 800px;
+  position: relative;
   .qa-ss-title {
     margin-bottom: 1em;
+  }
+  .qa-ss-back-button {
+    position: absolute;
+    background: transparent;
+    top: -42px;
+    font-size: 30px;
+    color: var(--qa-color-font-dark);
+    left: 0;
+    padding: 6px 6px 6px 0;
+
+    @include media-smaller(xs) {
+      top: -36px;
+      font-size: 24px;
+    }
   }
 }
 </style>
