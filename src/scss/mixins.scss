@@ -1,3 +1,5 @@
+@use 'sass:list';
+
 @mixin active-state($excludesHover: false) {
   @if $excludesHover == true {
     &:focus, &:active, &.active {
@@ -148,3 +150,30 @@ $screens: (
   'sm': $grid-sm,
   'lg': $grid-lg
 );
+
+@function slice($list, $start: 1, $end: list.length($list)) {
+  $result: ();
+
+  @if ($end < 0) {
+    $end: list.length($list) + $end;
+  }
+
+  @for $i from $start through $end {
+    $result: append($result, nth($list, $i));
+  }
+
+  @return $result;
+}
+
+@function transition($args...) {
+  $props: slice($args, 1, -2);
+  $time: animTime(list.nth($args, -2));
+  $ease: list.nth($args, -1);
+
+  $transition: ();
+  @each $prop in $props {
+    $transition: list.append($transition, ($prop $time $ease), $separator: comma);
+  }
+
+  @return $transition;
+}

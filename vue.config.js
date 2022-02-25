@@ -7,6 +7,9 @@ module.exports = {
         additionalData: `
           @import "@/scss/_globalIncludes.scss";
         `,
+        sassOptions: {
+          includePaths: ['./node_modules'],
+        },
       },
     },
   },

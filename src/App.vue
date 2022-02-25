@@ -37,7 +37,7 @@ export default defineComponent({
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
-  color: var(--qa-font-color-dark);
+  color: var(--qa-color-font-dark);
   height: 100%;
 }
 body,
@@ -50,7 +50,7 @@ html {
     div,
     section,
     aside {
-      background-color: var(--qa-background-color);
+      background-color: var(--qa-color-background);
     }
   }
 }

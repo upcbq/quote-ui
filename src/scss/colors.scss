@@ -1,9 +1,52 @@
-$qa-primary-color: #5a99e1;
-$qa-secondary-color: #e15ab2;
-$qa-background-color: #ffffff;
-$qa-icon-color: #ffffff;
-$qa-icon-color-dark: #373636;
-$qa-font-color: #ffffff;
-$qa-font-color-dark: #373636;
-$qa-color-border: #969696;
-$qa-disabled-color: #7f7f7f;
+@use "sass:map";
+@use "sass:color";
+
+$qa-colors: (
+  primary: #5a99e1,
+  secondary: #e15ab2,
+  background: #ECECEC,
+  icon: #ffffff,
+  icon-dark: #373636,
+  font: #ffffff,
+  font-dark: #373636,
+  border: #969696,
+  disabled: #7f7f7f,
+  'white': #ffffff,
+);
+
+@function qa-color($keys...) {
+  $value: $qa-colors;
+
+  @each $key in $keys {
+    $value: map-get($value, $key);
+  }
+
+  @return $value;
+}
+
+@mixin qa-color-vars() {
+  @each $name, $color in $qa-colors {
+    --qa-color-#{$name}: #{$color};
+  }
+}
+
+@mixin qa-color-vars-variants() {
+  // Only want to generate light and dark variants of certain included colors
+  $qa-colors-variants: map.remove(
+    $qa-colors,
+    'white',
+    disabled,
+    border,
+    font-dark,
+    font,
+    icon-dark,
+    icon,
+    background
+  );
+  @each $name, $color in $qa-colors-variants {
+    @for $i from 1 through 5 {
+      --qa-color-#{$name}--lighten-#{$i * 10}: #{color.adjust($color, $lightness: $i * 10%)};
+      --qa-color-#{$name}--darken-#{$i * 10}: #{color.adjust($color, $lightness: $i * -10%)};
+    }
+  }
+}

@@ -2,13 +2,13 @@ input, textarea, select, form, button {
   border: none;
   margin: 0;
   padding: 0;
-  line-height: 1;
+  font: inherit;
+  line-height: 1em;
   display: inline-block;
   vertical-align: middle;
   align-items: center;
   white-space: normal;
   color: inherit;
-  font: inherit;
   @include active-state {
     outline: none;
   }

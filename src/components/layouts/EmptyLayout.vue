@@ -9,7 +9,9 @@
         >{{ link.label }}</router-link
       >
     </div>
-    <slot></slot>
+    <div class="el-content">
+      <slot></slot>
+    </div>
   </div>
 </template>
 
@@ -44,15 +46,15 @@ export default defineComponent({
   height: 100%;
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  align-items: center;
 
   .test-links {
-    position: absolute;
-    top: 0;
+    width: 100%;
+    justify-self: flex-start;
     display: flex;
+    flex-grow: 0;
     flex-direction: row;
     align-items: center;
+    justify-content: center;
     padding: 5px 0;
 
     .test-link:not(:last-child) {
@@ -65,11 +67,16 @@ export default defineComponent({
         position: absolute;
         height: 60%;
         width: 1px;
-        background-color: var(--qa-color-border);
         left: 100%;
         top: 20%;
       }
     }
+  }
+
+  .el-content {
+    width: 100%;
+    flex-grow: 1;
+    overflow-y: scroll;
   }
 }
 </style>

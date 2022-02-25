@@ -3,16 +3,10 @@
 @import './styles/styles.scss';
 
 :root {
-  --qa-primary-color: #{$qa-primary-color};
-  --qa-secondary-color: #{$qa-secondary-color};
-  --qa-background-color: #{$qa-background-color};
-  --qa-animation-speed: #{$qa-animation-speed};
-  --qa-icon-color: #{$qa-icon-color};
-  --qa-icon-color-dark: #{$qa-icon-color-dark};
-  --qa-font-color: #{$qa-font-color};
-  --qa-font-color-dark: #{$qa-font-color-dark};
-  --qa-color-border: #{$qa-color-border};
-  --qa-disabled-color: #{$qa-disabled-color};
+  @include qa-color-vars();
+  @include qa-color-vars-variants();
 
   --qa-hover-brightness: 90%;
+  --qa-border-radius: 8px;
+  --qa-animation-speed: #{$qa-animation-speed};
 }
