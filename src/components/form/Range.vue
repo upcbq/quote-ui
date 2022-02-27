@@ -18,7 +18,8 @@
       v-if="!hideTooltip"
       class="qa-range-bubble mdc-elevation--z2 nowrap"
       :style="{
-        left: left,
+        '--position': left,
+        '--correction': correction,
       }"
       >{{ tooltip || value }}</output
     >
@@ -70,8 +71,8 @@ export default defineComponent({
         const val =
           (touch!.pageX - slider.getBoundingClientRect().left) /
           (slider.getBoundingClientRect().right - slider.getBoundingClientRect().left);
-        let max = Number(slider.getAttribute('max')) || 100;
-        const min = Number(slider.getAttribute('min')) || 1;
+        let max = Number(this.max) || 100;
+        const min = Number(this.min) || 1;
         const segment = 1 / (max - min),
           segmentArr = [];
 
@@ -102,13 +103,31 @@ export default defineComponent({
     const left = computed(() => {
       const val = Number(value.value || 0);
       const leftNum = Number((val - props.min) * 100) / (props.max - props.min);
-      return `calc(${leftNum}% + (${12 - leftNum * 0.25}px))`;
+      return leftNum;
+    });
+
+    const rangeEl = ref<HTMLElement | null>(null);
+    const outputEl = ref<HTMLElement | null>(null);
+
+    const correction = computed(() => {
+      const total = props.max - props.min;
+      const val = Number(value.value || 0);
+      const maxDiff = props.max - val;
+      const minDiff = val - props.min;
+      const sign = maxDiff > minDiff ? -1 : 1;
+      const offset = Math.min(maxDiff, minDiff);
+      const edgeOffset = offset / total;
+
+      return sign * (0.5 - edgeOffset);
     });
 
     return {
       value,
       left,
       active,
+      correction,
+      rangeEl,
+      outputEl,
     };
   },
 });
@@ -204,6 +223,7 @@ export default defineComponent({
     }
   }
   .qa-range-bubble {
+    --position: 0;
     display: none;
     position: absolute;
     background-color: qa-color(border);
@@ -214,13 +234,16 @@ export default defineComponent({
     border-radius: 3px;
     padding: 4px 12px;
     transition: width animTime(0.2s) ease-in-out;
-    transform: translateX(-50%);
+    transform: translateX(calc(-50% - (var(--correction) * 100%)));
     z-index: 2;
+    left: calc(var(--position) * 1% + (50 - var(--position)) * 0.25px);
+    max-width: calc(100vw - 20px);
+    text-overflow: ellipsis;
 
     &::before {
       content: '';
       position: absolute;
-      left: 50%;
+      left: max(min(calc(50% + (var(--correction) * 100%)), calc(100% - 10px)), 10px);
       top: 100%;
       transform: translateX(-50%);
       border-top: 8px solid qa-color(border);
