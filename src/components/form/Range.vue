@@ -3,10 +3,20 @@
     <div class="qa-range--label">
       <slot name="label" />
     </div>
-    <input type="range" :min="min" :max="max" v-model="value" />
+    <div class="qa-range--track"></div>
+    <input
+      type="range"
+      :min="min"
+      :max="max"
+      v-model="value"
+      @touchstart="active = true"
+      @touchend="active = false"
+      @[isIOS?`touchmove`:null]="iosFix"
+      :class="{ active: active }"
+    />
     <output
       v-if="!hideTooltip"
-      class="qa-range-bubble mdc-elevation--z2"
+      class="qa-range-bubble mdc-elevation--z2 nowrap"
       :style="{
         left: left,
       }"
@@ -16,7 +26,7 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent } from 'vue';
+import { computed, defineComponent, ref } from 'vue';
 
 export default defineComponent({
   name: 'QaRange',
@@ -41,6 +51,43 @@ export default defineComponent({
       default: false,
     },
   },
+  data: () => ({
+    isIOS: !!navigator.platform.match(/iPhone|iPod|iPad/),
+  }),
+  methods: {
+    iosFix(e: TouchEvent) {
+      // Should only be bound for iOS devices to fix a range issue if beginning touch
+      // from outside of the range thumb
+      const slider = e.target;
+      if (
+        this.isIOS &&
+        slider instanceof HTMLInputElement &&
+        e.touches &&
+        e.touches.length === 1
+      ) {
+        e.preventDefault();
+        const touch = e.touches && e.touches.item(0);
+        const val =
+          (touch!.pageX - slider.getBoundingClientRect().left) /
+          (slider.getBoundingClientRect().right - slider.getBoundingClientRect().left);
+        let max = Number(slider.getAttribute('max')) || 100;
+        const min = Number(slider.getAttribute('min')) || 1;
+        const segment = 1 / (max - min),
+          segmentArr = [];
+
+        max++;
+
+        for (let i = 0; i < max; i++) {
+          segmentArr.push(segment * i);
+        }
+
+        const segCopy = segmentArr.slice(),
+          ind = segmentArr.sort((a, b) => Math.abs(val - a) - Math.abs(val - b))[0];
+
+        this.value = String(segCopy.indexOf(ind));
+      }
+    },
+  },
   emits: {
     'update:modelValue': null,
   },
@@ -49,6 +96,8 @@ export default defineComponent({
       get: () => props.modelValue,
       set: (value) => emit('update:modelValue', Number(value)),
     });
+
+    const active = ref(false);
 
     const left = computed(() => {
       const val = Number(value.value || 0);
@@ -59,6 +108,7 @@ export default defineComponent({
     return {
       value,
       left,
+      active,
     };
   },
 });
@@ -69,24 +119,49 @@ export default defineComponent({
   position: relative;
   margin: 30px 0;
 
+  .qa-range--track {
+    height: 6px;
+    border-radius: 3px;
+    width: 100%;
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background-color: var(--qa-color-primary);
+    z-index: 0;
+  }
+
   input[type='range'] {
     -webkit-appearance: none;
     appearance: none;
     background: transparent;
     cursor: pointer;
     width: 100%;
+    z-index: 1;
+    position: relative;
+    -webkit-tap-highlight-color: transparent;
+
+    @include ios-only {
+      padding: 20px 0;
+      margin: -20px 0;
+    }
 
     &::-webkit-slider-runnable-track {
-      background: qa-color(primary);
+      background: transparent;
       height: 6px;
       border-radius: 3px;
-      margin: 0;
+      border-top: 20px solid transparent;
+      border-bottom: 20px solid transparent;
+      margin: -20px 0;
+      box-sizing: content-box;
     }
     &::-moz-range-track {
-      background: qa-color(primary);
+      background: transparent;
       height: 6px;
       border-radius: 3px;
-      margin: 0;
+      border-top: 20px solid transparent;
+      border-bottom: 20px solid transparent;
+      margin: -20px 0;
+      box-sizing: content-box;
     }
 
     &::-webkit-slider-thumb {
@@ -116,7 +191,8 @@ export default defineComponent({
       }
     }
 
-    &:active {
+    &:active,
+    &.active {
       & ~ .qa-range-bubble {
         display: initial;
       }
@@ -139,6 +215,7 @@ export default defineComponent({
     padding: 4px 12px;
     transition: width animTime(0.2s) ease-in-out;
     transform: translateX(-50%);
+    z-index: 2;
 
     &::before {
       content: '';
@@ -160,6 +237,7 @@ export default defineComponent({
     position: absolute;
     left: 0;
     top: -18px;
+    pointer-events: none;
   }
 }
 </style>

@@ -20,8 +20,8 @@ import SelectVerseRange from '@/components/molecules/SelectVerseRange.vue';
 import Card from '@/components/content/Card.vue';
 import { VerseListLimitedResponse } from '@/api/modules/verseList/verseListApi.interfaces';
 import { useStore } from '@/store/store';
-import Button from '../form/Button.vue';
-import Icon from '../content/Icon.vue';
+import Button from '@/components/form/Button.vue';
+import Icon from '@/components/content/Icon.vue';
 
 export default defineComponent({
   name: 'SessionSetup',

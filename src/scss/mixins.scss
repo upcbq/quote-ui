@@ -177,3 +177,21 @@ $screens: (
 
   @return $transition;
 }
+
+@mixin webkit-only() {
+  @supports (not (-moz-appearance: none)) {
+    @content;
+  }
+}
+
+@mixin gecko-only() {
+  @supports (-moz-appearance: none) {
+    @content;
+  }
+}
+
+@mixin ios-only() {
+  @supports (-webkit-touch-callout: none) {
+    @content;
+  }
+}
