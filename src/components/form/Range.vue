@@ -67,6 +67,7 @@ export default defineComponent({
         e.touches.length === 1
       ) {
         e.preventDefault();
+        this.active = true;
         const touch = e.touches && e.touches.item(0);
         const val =
           (touch!.pageX - slider.getBoundingClientRect().left) /
