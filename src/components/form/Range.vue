@@ -69,17 +69,15 @@ export default defineComponent({
         e.preventDefault();
         this.active = true;
         const touch = e.touches && e.touches.item(0);
+        const sliderRect = slider.getBoundingClientRect();
         const val =
-          (touch!.pageX - slider.getBoundingClientRect().left) /
-          (slider.getBoundingClientRect().right - slider.getBoundingClientRect().left);
+          (touch!.pageX - sliderRect.left) / (sliderRect.right - sliderRect.left);
         let max = Number(this.max) || 100;
         const min = Number(this.min) || 1;
-        const segment = 1 / (max - min),
+        const segment = 1 / (++max - min),
           segmentArr = [];
 
-        max++;
-
-        for (let i = 0; i < max; i++) {
+        for (let i = 0; i <= max - min; i++) {
           segmentArr.push(segment * i);
         }
 
