@@ -12,6 +12,7 @@ $qa-colors: (
   border: #969696,
   disabled: #7f7f7f,
   'white': #ffffff,
+  'black': #000000,
 );
 
 @function qa-color($keys...) {
@@ -34,7 +35,6 @@ $qa-colors: (
   // Only want to generate light and dark variants of certain included colors
   $qa-colors-variants: map.remove(
     $qa-colors,
-    'white',
     disabled,
     border,
     font-dark,
