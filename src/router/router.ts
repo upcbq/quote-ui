@@ -12,6 +12,14 @@ export const routes: Array<RouteRecordRaw> = [
     },
   },
   {
+    path: '/quote-session',
+    name: 'Quote Session',
+    component: () => import(/* webpackChunkName "quote" */ '@/views/QuoteSession.vue'),
+    meta: {
+      layout: 'empty',
+    },
+  },
+  {
     path: '/record',
     name: 'Record',
     component: () => import(/* webpackChunkName: "record" */ '@/components/Record.vue'),

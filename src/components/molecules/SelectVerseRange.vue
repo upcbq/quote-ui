@@ -22,6 +22,7 @@
     >
       <template v-slot:label>Fine</template>
     </Range>
+    <Button @click.prevent="$emit('select', finalSelectedIndex)">Begin</Button>
   </div>
 </template>
 
@@ -31,12 +32,16 @@ import { computed, defineComponent, ref, watch } from 'vue';
 import Range from '@/components/form/Range.vue';
 import { referenceToString } from '@/utilities/utilityFunctions';
 import PlaceholderText from '@/components/form/PlaceholderText.vue';
+import Button from '@/components/form/Button.vue';
 
 const FINE_RANGE = 5;
 
 export default defineComponent({
   name: 'QaSelectVerseRange',
-  components: { Range, PlaceholderText },
+  components: { Range, PlaceholderText, Button },
+  emits: {
+    select: null,
+  },
   setup() {
     const store = useStore();
 
@@ -85,6 +90,13 @@ export default defineComponent({
       );
     });
 
+    const finalSelectedIndex = computed(() => {
+      if (selectedVerse.value) {
+        return verses.value.indexOf(selectedVerse.value);
+      }
+      return -1;
+    });
+
     const fineTooltip = computed(() => {
       return (
         (selectedVerse.value && referenceToString(selectedVerse.value)) ||
@@ -112,7 +124,7 @@ export default defineComponent({
       fineTooltip,
       selectedRoughIndex,
       selectedFineIndex,
-      selectedVerse,
+      finalSelectedIndex,
       showFine,
     };
   },

@@ -9,12 +9,12 @@
     </Button>
     <h2 class="font-h-2 text-left qa-ss-title">Session Setup</h2>
     <SelectVerseList v-if="state === 'selectVerseList'" @select="selectVerseList" />
-    <SelectVerseRange v-else />
+    <SelectVerseRange v-else @select="selectVerseRange" />
   </Card>
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue';
+import { defineComponent, ref } from 'vue';
 import SelectVerseList from '@/components/molecules/SelectVerseList.vue';
 import SelectVerseRange from '@/components/molecules/SelectVerseRange.vue';
 import Card from '@/components/content/Card.vue';
@@ -25,16 +25,26 @@ import Icon from '@/components/content/Icon.vue';
 
 export default defineComponent({
   name: 'SessionSetup',
-  data: () => ({
-    state: 'selectVerseList' as 'selectVerseList' | 'selectRange',
-  }),
-  methods: {
-    async selectVerseList(verseList: VerseListLimitedResponse) {
-      const store = useStore();
+  setup() {
+    const store = useStore();
+
+    const state = ref<'selectVerseList' | 'selectRange'>('selectVerseList');
+
+    async function selectVerseList(verseList: VerseListLimitedResponse) {
       store.commit('session/setSelectedVerseListId', verseList._id);
       await store.dispatch('session/fetchVerseList');
-      this.state = 'selectRange';
-    },
+      state.value = 'selectRange';
+    }
+
+    async function selectVerseRange(finalVerseIndex: number) {
+      store.commit('session/setFinalVerseIndex', finalVerseIndex);
+    }
+
+    return {
+      state,
+      selectVerseList,
+      selectVerseRange,
+    };
   },
   components: {
     SelectVerseList,

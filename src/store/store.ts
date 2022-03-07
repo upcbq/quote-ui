@@ -3,10 +3,11 @@ import { verseList } from '@/store/modules/verseList/verseList';
 import { session } from '@/store/modules/session/session';
 import { audio } from '@/store/modules/audio/audio';
 import { RootState, StoreType } from './store.interfaces';
-import createPersistedState from 'vuex-persist-indexeddb';
+import VuexPersistence from 'vuex-persist';
 
-const persistedSession = createPersistedState({
-  paths: 'session',
+const sessionPersistence = new VuexPersistence({
+  storage: window.localStorage,
+  modules: ['session'],
 });
 
 export const RootStoreState: () => RootState = () => ({});
@@ -26,7 +27,7 @@ export const store = createStore({
     session,
     audio,
   },
-  plugins: [persistedSession],
+  plugins: [sessionPersistence.plugin],
 }) as StoreType;
 
 export function useStore() {

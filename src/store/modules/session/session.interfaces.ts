@@ -5,8 +5,15 @@ import {
   SessionStoreMutations,
 } from './session';
 
+export interface SessionCompleteVerse {
+  correct: boolean;
+  reviewed: boolean;
+}
+
 export interface SessionState {
   selectedVerseListId: string;
+  finalVerseIndex: number;
+  complete: Record<number, SessionCompleteVerse>;
 }
 
 type SessionNamespace<N extends string> = `session/${N}`;
