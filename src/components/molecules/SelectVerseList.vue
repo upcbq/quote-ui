@@ -68,9 +68,11 @@ export default defineComponent({
     const store = useStore();
 
     const vlYears = computed(() =>
-      (Array.from(
-        store.state.verseList.verseLists.reduce((s, vl) => s.add(vl.year), new Set())
-      ) as number[])
+      (
+        Array.from(
+          store.state.verseList.verseLists.reduce((s, vl) => s.add(vl.year), new Set())
+        ) as number[]
+      )
         .sort()
         .reverse()
     );

@@ -13,7 +13,7 @@ export class AudioRecorder {
     this.currentRecording = [];
 
     this.mediaRecorder.addEventListener('dataavailable', (ev) => {
-      this.currentRecording.push(((ev as unknown) as { data: Blob }).data);
+      this.currentRecording.push((ev as unknown as { data: Blob }).data);
     });
   }
 
