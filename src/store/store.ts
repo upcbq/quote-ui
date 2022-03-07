@@ -2,6 +2,7 @@ import { createStore } from 'vuex';
 import { verseList } from '@/store/modules/verseList/verseList';
 import { session } from '@/store/modules/session/session';
 import { audio } from '@/store/modules/audio/audio';
+import { ui } from '@/store/modules/ui/ui';
 import { RootState, StoreType } from './store.interfaces';
 import VuexPersistence from 'vuex-persist';
 
@@ -26,6 +27,7 @@ export const store = createStore({
     verseList,
     session,
     audio,
+    ui,
   },
   plugins: [sessionPersistence.plugin],
 }) as StoreType;

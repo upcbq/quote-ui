@@ -1,8 +1,9 @@
 import { CommitOptions, DispatchOptions, Store as VuexStore } from 'vuex';
 import { RootStoreActions, RootStoreGetters, RootStoreMutations } from './store';
-import { VerseListStoreModuleType } from './modules/verseList/verseList.interfaces';
-import { SessionStoreModuleType } from './modules/session/session.interfaces';
-import { AudioStoreModuleType } from './modules/audio/audio.interfaces';
+import { VerseListStoreModuleType } from '@/store/modules/verseList/verseList.interfaces';
+import { SessionStoreModuleType } from '@/store/modules/session/session.interfaces';
+import { AudioStoreModuleType } from '@/store/modules/audio/audio.interfaces';
+import { UiStoreModuleType } from '@/store/modules/ui/ui.interfaces';
 
 export interface RootState {}
 
@@ -32,4 +33,5 @@ export type RootStoreType<S = RootState> = Omit<
 
 export type StoreType = VerseListStoreModuleType &
   SessionStoreModuleType &
-  AudioStoreModuleType;
+  AudioStoreModuleType &
+  UiStoreModuleType;
