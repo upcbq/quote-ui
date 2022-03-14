@@ -20,6 +20,8 @@ WORKDIR /usr/share/nginx/html
 
 RUN rm -rf ./*
 
+COPY ./docker/nginx/default.conf /etc/nginx/conf.d/default.conf
+
 COPY --from=builder /home/node/app/dist .
 
 ARG PORT
