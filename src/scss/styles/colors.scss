@@ -1,0 +1,22 @@
+@use "sass:map";
+
+$qa-colors-bg: map.remove(
+  $qa-colors,
+  primary,
+  secondary,
+  background,
+  icon,
+  icon-dark,
+  font,
+  font-dark,
+  border,
+  disabled,
+  'white',
+  'black',
+);
+
+@each $name, $color in $qa-colors-bg {
+  .qa-color-#{$name} {
+    background-color: #{$color};
+  }
+}

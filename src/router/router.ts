@@ -2,9 +2,15 @@ import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router';
 import Home from '@/views/Home.vue';
 import { disallowAuthGuard, requireAuthGuard } from './navigationGuards';
 
+export const PATH = {
+  home: '/',
+  quote: '/quote-session',
+  record: '/record',
+};
+
 export const routes: Array<RouteRecordRaw> = [
   {
-    path: '/',
+    path: PATH.home,
     name: 'Home',
     component: Home,
     meta: {
@@ -12,7 +18,7 @@ export const routes: Array<RouteRecordRaw> = [
     },
   },
   {
-    path: '/quote-session',
+    path: PATH.quote,
     name: 'Quote Session',
     component: () => import(/* webpackChunkName "quote" */ '@/views/QuoteSession.vue'),
     meta: {
@@ -20,7 +26,7 @@ export const routes: Array<RouteRecordRaw> = [
     },
   },
   {
-    path: '/record',
+    path: PATH.record,
     name: 'Record',
     component: () => import(/* webpackChunkName: "record" */ '@/components/Record.vue'),
     meta: {

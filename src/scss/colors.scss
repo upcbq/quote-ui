@@ -9,8 +9,12 @@ $qa-colors: (
   icon-dark: #373636,
   font: #ffffff,
   font-dark: #373636,
+  font-medium: #999999,
   border: #969696,
   disabled: #7f7f7f,
+  bg-blue: #C9DBFF,
+  bg-yellow: #FFF0C9,
+  bg-green: #C1EACC,
   'white': #ffffff,
   'black': #000000,
 );
@@ -38,10 +42,14 @@ $qa-colors: (
     disabled,
     border,
     font-dark,
+    font-medium,
     font,
     icon-dark,
     icon,
-    background
+    background,
+    bg-blue,
+    bg-yellow,
+    bg-green,
   );
   @each $name, $color in $qa-colors-variants {
     @for $i from 1 through 5 {

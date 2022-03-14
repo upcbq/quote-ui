@@ -10,3 +10,7 @@ declare module 'worker-loader!*' {
   function createInstance<T>(): Workerized<T>;
   export = createInstance;
 }
+
+interface Array<T> {
+  at(i: number): T | undefined;
+}

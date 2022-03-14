@@ -8,7 +8,7 @@ import VuexPersistence from 'vuex-persist';
 
 const sessionPersistence = new VuexPersistence({
   storage: window.localStorage,
-  modules: ['session'],
+  modules: ['session', 'verseList'],
 });
 
 export const RootStoreState: () => RootState = () => ({});

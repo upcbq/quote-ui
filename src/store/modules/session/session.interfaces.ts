@@ -8,12 +8,17 @@ import {
 export interface SessionCompleteVerse {
   correct: boolean;
   reviewed: boolean;
+  skipped: boolean;
+  order: number;
+  index: number;
 }
 
 export interface SessionState {
   selectedVerseListId: string;
   finalVerseIndex: number;
   complete: Record<number, SessionCompleteVerse>;
+  order: number[];
+  shuffle: boolean;
 }
 
 type SessionNamespace<N extends string> = `session/${N}`;

@@ -22,11 +22,15 @@ import { VerseListLimitedResponse } from '@/api/modules/verseList/verseListApi.i
 import { useStore } from '@/store/store';
 import Button from '@/components/form/Button.vue';
 import Icon from '@/components/content/Icon.vue';
+import { useRouter } from 'vue-router';
+import { PATH } from '@/router/router';
 
 export default defineComponent({
   name: 'SessionSetup',
   setup() {
     const store = useStore();
+
+    const router = useRouter();
 
     const state = ref<'selectVerseList' | 'selectRange'>('selectVerseList');
 
@@ -38,6 +42,8 @@ export default defineComponent({
 
     async function selectVerseRange(finalVerseIndex: number) {
       store.commit('session/setFinalVerseIndex', finalVerseIndex);
+      store.commit('session/resetComplete');
+      router.push(PATH.quote);
     }
 
     return {

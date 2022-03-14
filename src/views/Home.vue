@@ -25,10 +25,5 @@ export default defineComponent({
   display: flex;
   align-items: center;
   justify-content: center;
-  .qa-test-card {
-    width: calc(100% - 40px);
-    box-sizing: border-box;
-    max-width: 800px;
-  }
 }
 </style>

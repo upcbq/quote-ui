@@ -20,5 +20,9 @@ npm run build
 npm run lint
 ```
 
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).
+### TODO:
+
+Investigate migrating to pinia due to vuex 4 getter caching issues.
+
+* https://pinia.vuejs.org/introduction.html
+* https://seb-l.github.io/pinia-plugin-persist/
