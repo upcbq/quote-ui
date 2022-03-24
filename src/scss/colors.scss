@@ -17,6 +17,7 @@ $qa-colors: (
   bg-green: #C1EACC,
   'white': #ffffff,
   'black': #000000,
+  'red': #D85D5D,
 );
 
 @function qa-color($keys...) {

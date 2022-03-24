@@ -31,6 +31,7 @@ export default defineComponent({
   transition: transition(background-color, color, 0.1s, ease-in-out);
   font-size: 20px;
   padding: 0.5em 1em;
+  font-family: $qa-font-sans;
 
   &.light {
     border: 2px solid var(--qa-color-primary);
