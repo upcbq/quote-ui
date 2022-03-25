@@ -1,27 +1,29 @@
 <template>
   <div class="qa-quote-session">
     <div class="qa-qs-settings">
-      <IconButton icon="settings"></IconButton>
+      <button class="clear-btn qa-qs-skipped-button">
+        <span class="underline">skipped&nbsp;</span>
+        <span>({{ skipped.length }})</span>
+      </button>
+      <IconButton icon="settings">Test</IconButton>
     </div>
     <div class="qa-qs-display">
       <div class="qa-qs-top-controls">
-        <Toggle id="auto-continue-toggle">Auto Advance</Toggle>
+        <Toggle
+          id="auto-continue-toggle"
+          v-model="autoAdvance"
+          title="auto start recording"
+          >Auto Advance</Toggle
+        >
       </div>
       <QuizCard class="qa-qs-card" v-if="activeVerseString">
         {{ activeVerseString }}
       </QuizCard>
-      <div class="qa-qs-controls">
-        <IconButton
-          :icon="shuffle ? 'shuffle_on' : 'shuffle'"
-          class="qa-qs-shuffle"
-          @click.prevent="toggleShuffle"
-        >
-        </IconButton>
-        <RecordButton icon="fiber_manual_record" class="qa-qs-rec-button" border>
-          REC
-        </RecordButton>
-        <IconButton icon="skip_next"> </IconButton>
-      </div>
+      <SessionControls
+        class="qa-qs-controls"
+        :current-index="activeVerseRef?.index"
+        :mode="mode"
+      ></SessionControls>
     </div>
     <div class="qa-qs-stacks">
       <CardStackDisplay :verses="unquoted.slice(1)" class="qa-color-bg-blue">
@@ -39,19 +41,25 @@
 
 <script lang="ts">
 import { useStore } from '@/store/store';
-import { computed, defineComponent } from 'vue';
+import { computed, defineComponent, ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { PATH } from '@/router/router';
 import QuizCard from '@/components/atoms/QuizCard.vue';
 import { referenceToString } from '@/utilities/utilityFunctions';
 import CardStackDisplay from '@/components/molecules/CardStackDisplay.vue';
 import IconButton from '@/components/molecules/IconButton.vue';
-import RecordButton from '@/components/molecules/RecordButton.vue';
 import Toggle from '@/components/form/Toggle.vue';
+import SessionControls from '@/components/molecules/SessionControls.vue';
 
 export default defineComponent({
   name: 'QuoteSession',
-  components: { QuizCard, CardStackDisplay, IconButton, RecordButton, Toggle },
+  components: {
+    QuizCard,
+    CardStackDisplay,
+    IconButton,
+    Toggle,
+    SessionControls,
+  },
   mounted() {
     // If there is no session started, redirect to home page to set up session
     const store = useStore();
@@ -62,6 +70,9 @@ export default defineComponent({
   },
   setup() {
     const store = useStore();
+
+    const mode = ref<'quote' | 'review'>('quote');
+
     const unquoted = computed(() => {
       return store.getters['session/unquotedVerses'];
     });
@@ -77,27 +88,29 @@ export default defineComponent({
     const activeVerseString = computed(() => {
       return (activeVerseRef.value && referenceToString(activeVerseRef.value)) || '';
     });
-    const shuffle = computed(() => {
-      return store.state.session.shuffle;
+    const autoAdvance = computed({
+      get: () => store.state.session.options.autoAdvance,
+      set: (value) => store.commit('session/setAutoAdvance', value),
+    });
+    const skipped = computed(() => {
+      return store.getters['session/skippedVerses'];
     });
 
     function testQuote() {
       if (!activeVerseRef.value) return;
       store.dispatch('session/quoteVerse', activeVerseRef.value?.index);
     }
-
-    function toggleShuffle() {
-      store.dispatch('session/shuffle', !shuffle.value);
-    }
     return {
       unquoted,
       unreviewed,
       complete,
+      activeVerseRef,
       activeVerseString,
+      autoAdvance,
+      skipped,
       testQuote,
-      toggleShuffle,
       store,
-      shuffle,
+      mode,
     };
   },
 });
@@ -132,9 +145,6 @@ export default defineComponent({
     justify-content: flex-end;
     display: flex;
   }
-  .qa-qs-shuffle {
-    position: relative;
-  }
   .qa-qs-top-controls {
     display: flex;
     flex-direction: row;
@@ -143,11 +153,17 @@ export default defineComponent({
     margin-bottom: 20px;
   }
   .qa-qs-controls {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    justify-content: space-between;
     margin-top: 20px;
+  }
+  .qa-qs-skipped-button {
+    font-family: $qa-font-sans;
+    color: var(--qa-color-disabled);
+    transition: color 0.1s ease-in-out;
+    cursor: pointer;
+    padding: 0 20px;
+    &:hover {
+      color: var(--qa-color-font-dark);
+    }
   }
 }
 

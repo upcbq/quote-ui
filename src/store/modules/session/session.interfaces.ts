@@ -13,12 +13,19 @@ export interface SessionCompleteVerse {
   index: number;
 }
 
+export interface SessionOptions {
+  autoAdvance: boolean;
+  batchSize: number;
+  playbackSpeed: number;
+}
+
 export interface SessionState {
   selectedVerseListId: string;
   finalVerseIndex: number;
   complete: Record<number, SessionCompleteVerse>;
   order: number[];
   shuffle: boolean;
+  options: SessionOptions;
 }
 
 type SessionNamespace<N extends string> = `session/${N}`;

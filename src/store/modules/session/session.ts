@@ -11,6 +11,11 @@ export const SessionStoreState: () => SessionState = () => ({
   complete: {},
   order: [],
   shuffle: false,
+  options: {
+    autoAdvance: false,
+    batchSize: -1,
+    playbackSpeed: 1,
+  },
 });
 
 export const SessionStoreMutations = {
@@ -41,6 +46,12 @@ export const SessionStoreMutations = {
   },
   setOrder(state: SessionState, order: SessionState['order']) {
     state.order = order;
+  },
+  setAutoAdvance(
+    state: SessionState,
+    autoAdvance: SessionState['options']['autoAdvance']
+  ) {
+    state.options.autoAdvance = autoAdvance;
   },
 };
 

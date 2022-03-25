@@ -15,6 +15,7 @@
     "localforage-getitems": "^1.4.2",
     "localforage-indexes": "^1.1.1",
     "localforage-startswith": "^1.4.0",
+    "lodash": "^4.17.21",
     "mp3-mediarecorder": "^4.0.5",
     "vue": "^3.2.31",
     "vue-router": "^4.0.13",
@@ -25,6 +26,7 @@
   "devDependencies": {
     "@types/dom-mediacapture-record": "^1.0.11",
     "@types/json2mq": "^0.2.0",
+    "@types/lodash": "^4.14.180",
     "@typescript-eslint/eslint-plugin": "^2.33.0",
     "@typescript-eslint/parser": "^2.33.0",
     "@vue/cli-plugin-babel": "~4.5.0",

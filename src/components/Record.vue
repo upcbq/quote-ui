@@ -2,22 +2,25 @@
   <div class="qa-record">
     Recording test
     <div v-if="!isPlayingBack" class="recording-container">
-      <button class="record-btn clear-btn" @click.prevent="record()" v-if="!isRecording">
+      <button
+        class="record-btn clear-btn big"
+        @click.prevent="record()"
+        v-if="!isRecording"
+      >
         <Icon name="fiber_manual_record" style="color: red"></Icon>
       </button>
-      <button class="stop-record-btn clear-btn" @click.prevent="stopRecording()" v-else>
+      <button
+        class="stop-record-btn clear-btn big"
+        @click.prevent="stopRecording()"
+        v-else
+      >
         <Icon name="stop" style="color: red"></Icon>
       </button>
     </div>
     <div v-else class="playback-container">
-      <button class="stop-btn clear-btn" @click.prevent="stop()">
+      <AudioPlayer :src="audioPlayback?.audioEl.src" />
+      <button class="stop-btn clear-btn big" @click.prevent="stop()">
         <Icon name="stop" style="color: blue"></Icon>
-      </button>
-      <button class="play-btn clear-btn" @click.prevent="play()" v-if="isPaused">
-        <Icon name="play_arrow" style="color: blue"></Icon>
-      </button>
-      <button class="pause-btn clear-btn" @click.prevent="pause()" v-else>
-        <Icon name="pause" style="color: blue"></Icon>
       </button>
     </div>
   </div>
@@ -28,11 +31,13 @@ import { AudioPlayback } from '@/services/audio/audioPlayback';
 import { AudioRecorder } from '@/services/audio/audioRecorder';
 import Icon from '@/components/content/Icon.vue';
 import { computed, defineComponent, ref, shallowRef } from 'vue';
+import AudioPlayer from './molecules/AudioPlayer.vue';
 
 export default defineComponent({
   name: 'QaRecord',
   components: {
     Icon,
+    AudioPlayer,
   },
   setup() {
     const isPlayingBack = ref<boolean>(false);
@@ -49,8 +54,12 @@ export default defineComponent({
     });
 
     const record = async () => {
-      audioRecorder.value = await AudioRecorder.initialize();
-      audioRecorder.value.start();
+      try {
+        audioRecorder.value = await AudioRecorder.initialize();
+        audioRecorder.value.start();
+      } catch (e) {
+        console.log(e);
+      }
     };
 
     const stopRecording = async () => {
@@ -77,6 +86,7 @@ export default defineComponent({
       isRecording,
       isPlayingBack,
       isPaused,
+      audioPlayback,
       record,
       stopRecording,
       play,
@@ -97,7 +107,7 @@ export default defineComponent({
   max-width: 90%;
   height: 200px;
 
-  .material-icons {
+  .big .material-icons {
     font-size: 50px;
   }
 }
