@@ -41,8 +41,7 @@ export default defineComponent({
     }
 
     async function selectVerseRange(finalVerseIndex: number) {
-      store.commit('session/setFinalVerseIndex', finalVerseIndex);
-      store.commit('session/resetComplete');
+      store.dispatch('session/startSession', finalVerseIndex);
       router.push(PATH.quote);
     }
 

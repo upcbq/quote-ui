@@ -4,6 +4,8 @@ import { RootState, StoreType } from '@/store/store.interfaces';
 import { indexArray, shuffle as shuffleArr } from '@/utilities/utilityFunctions';
 import { ActionContext, Module } from 'vuex';
 import { SessionCompleteVerse, SessionState } from './session.interfaces';
+import { v4 as uuidv4 } from 'uuid';
+import { AudioDb } from '@/storage/audio.db';
 
 export const SessionStoreState: () => SessionState = () => ({
   selectedVerseListId: '',
@@ -16,6 +18,7 @@ export const SessionStoreState: () => SessionState = () => ({
     batchSize: -1,
     playbackSpeed: 1,
   },
+  id: '',
 });
 
 export const SessionStoreMutations = {
@@ -52,6 +55,12 @@ export const SessionStoreMutations = {
     autoAdvance: SessionState['options']['autoAdvance']
   ) {
     state.options.autoAdvance = autoAdvance;
+  },
+  generateSessionId(state: SessionState) {
+    state.id = uuidv4();
+  },
+  resetSessionId(state: SessionState) {
+    state.id = '';
   },
 };
 
@@ -118,6 +127,37 @@ export const SessionStoreActions = {
       commit('setOrder', indexArray(getters.limitedVerses?.length || 0));
     }
   },
+  async startSession(
+    { commit, dispatch, state }: ActionContext<SessionState, RootState>,
+    finalVerseIndex: SessionState['finalVerseIndex']
+  ) {
+    await dispatch('clearAudio');
+    commit('generateSessionId');
+    commit('setFinalVerseIndex', finalVerseIndex);
+    commit('resetComplete');
+    if (state.shuffle) {
+      dispatch('shuffle', state.shuffle);
+    }
+    // Read any default / user settings here for session data
+  },
+  async clearAudio({ state }: ActionContext<SessionState, RootState>) {
+    try {
+      if (state.id) {
+        await AudioDb.deleteSessionAudio(state.id);
+      }
+    } catch (e) {
+      console.log(e);
+      // some issue deleting session audio
+    }
+  },
+  async stopSession({ commit, dispatch }: ActionContext<SessionState, RootState>) {
+    await dispatch('clearAudio');
+    commit('resetSessionId');
+    commit('resetComplete');
+    commit('setFinalVerseIndex', -1);
+    commit('setSelectedVerseListId', '');
+    commit('setOrder', []);
+  },
 };
 
 export const SessionStoreGetters = {
@@ -182,8 +222,16 @@ export const SessionStoreGetters = {
         return arr;
       }, [] as SessionCompleteVerse[])
       .sort((a, b) => a.order - b.order)
-      .map((cv) => limitedVerses.at(cv.index))
-      .filter((ref) => !!ref) as IReference[];
+      .reduce((arr, cv) => {
+        const v = limitedVerses.at(cv.index);
+        if (v) {
+          arr.push({
+            ...v,
+            index: cv.index,
+          });
+        }
+        return arr;
+      }, [] as Array<IReference & { index: number }>);
   },
   reviewedVerses(
     state: SessionState,
