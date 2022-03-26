@@ -1,5 +1,5 @@
-import { IVerse } from '@/api/types';
+import { IReference } from '@/api/types';
 
 export interface GetVersesRequest {
-  verses: IVerse[];
+  verses: IReference[];
 }

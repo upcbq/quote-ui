@@ -4,6 +4,7 @@ import { VerseListStoreModuleType } from '@/store/modules/verseList/verseList.in
 import { SessionStoreModuleType } from '@/store/modules/session/session.interfaces';
 import { AudioStoreModuleType } from '@/store/modules/audio/audio.interfaces';
 import { UiStoreModuleType } from '@/store/modules/ui/ui.interfaces';
+import { VerseStoreModuleType } from './modules/verse/verse.interfaces';
 
 export interface RootState {}
 
@@ -34,4 +35,5 @@ export type RootStoreType<S = RootState> = Omit<
 export type StoreType = VerseListStoreModuleType &
   SessionStoreModuleType &
   AudioStoreModuleType &
-  UiStoreModuleType;
+  UiStoreModuleType &
+  VerseStoreModuleType;
