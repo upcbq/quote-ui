@@ -16,8 +16,12 @@
           >Auto Advance</Toggle
         >
       </div>
-      <QuizCard class="qa-qs-card" v-if="activeVerseString">
-        {{ activeVerseString }}
+      <QuizCard
+        class="qa-qs-card"
+        v-if="activeVerseRef"
+        :ref-text="activeVerseString"
+        :verse-text="activeVerseText"
+      >
       </QuizCard>
       <SessionControls
         class="qa-qs-controls"
@@ -86,7 +90,14 @@ export default defineComponent({
       return unquoted.value?.at(0);
     });
     const activeVerseString = computed(() => {
-      return (activeVerseRef.value && referenceToString(activeVerseRef.value)) || '';
+    const activeVerseText = computed(() => {
+      return (
+        (mode.value === 'review' &&
+          activeVerseRef.value &&
+          store.getters['verse/verses'](activeVerseRef.value) &&
+          store.getters['verse/verses'](activeVerseRef.value).text) ||
+        ''
+      );
     });
     const autoAdvance = computed({
       get: () => store.state.session.options.autoAdvance,
@@ -106,6 +117,7 @@ export default defineComponent({
       complete,
       activeVerseRef,
       activeVerseString,
+      activeVerseText,
       autoAdvance,
       skipped,
       testQuote,

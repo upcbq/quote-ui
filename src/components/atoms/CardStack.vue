@@ -6,8 +6,8 @@
       <QuizCard
         class="qa-cs-card qa-cs-card--top"
         :style="{ opacity: count > 0 ? 1 : 0 }"
-        >{{ visibleReference }}</QuizCard
-      >
+        :ref-text="visibleReference"
+      ></QuizCard>
     </div>
   </div>
 </template>

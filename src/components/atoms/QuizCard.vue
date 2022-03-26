@@ -3,8 +3,15 @@
     <rect x="0" y="0" width="200" height="100"></rect>
     <foreignObject width="100%" height="100%">
       <div xmlns="http://www.w3.org/1999/xhtml" class="ref-text-container">
-        <p class="ref-text">
-          <slot></slot>
+        <p class="ref-text" v-if="refText">
+          {{ refText }}
+        </p>
+        <p
+          class="verse-text"
+          v-if="verseText"
+          :style="{ fontSize: `${verseTextFontSize}px` }"
+        >
+          {{ verseText }}
         </p>
       </div>
     </foreignObject>
@@ -12,12 +19,37 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue';
+import { computed, defineComponent } from 'vue';
+import { boundedNumber } from '@/utilities/utilityFunctions';
 
 export default defineComponent({
   name: 'QaQuizCard',
-  setup() {
-    //
+  props: {
+    verseText: {
+      type: String,
+      default: '',
+    },
+    refText: {
+      type: String,
+      default: '',
+    },
+  },
+  setup(props) {
+    const verseTextFontSize = computed(() => {
+      const textLength = props.verseText.length;
+      let size = 16;
+      let computedColumns = 180 / size;
+      let computedRows = textLength / computedColumns;
+      while (size * computedRows > 80) {
+        size--;
+        computedColumns = 180 / size;
+        computedRows = textLength / computedColumns;
+      }
+      return boundedNumber(size, 6, 16);
+    });
+    return {
+      verseTextFontSize,
+    };
   },
 });
 </script>
@@ -43,6 +75,15 @@ export default defineComponent({
     font-family: 'Noto Serif', 'Times New Roman', Times, serif;
     font-size: 16px;
     width: 100%;
+  }
+
+  .verse-text {
+    font-family: 'Noto Serif', 'Times New Roman', Times, serif;
+    max-height: 100%;
+    width: 100%;
+    text-align: left;
+    padding: 10px;
+    box-sizing: border-box;
   }
 
   @include media-smaller(xs) {

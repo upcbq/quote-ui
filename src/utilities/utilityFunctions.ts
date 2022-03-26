@@ -23,3 +23,7 @@ export function shuffle<T>(array: T[]): T[] {
 export function indexArray(length: number) {
   return Array.from(Array(length)).map((a, i) => i);
 }
+
+export function boundedNumber(num: number, min: number = num, max: number = num) {
+  return Math.min(Math.max(min, num), max);
+}
