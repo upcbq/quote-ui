@@ -1,6 +1,6 @@
 <template>
   <div class="qa-toggle-container">
-    <input type="checkbox" class="qa-toggle" v-bind="$attrs" :id="id" />
+    <input type="checkbox" class="qa-toggle" v-bind="$attrs" :id="id" v-model="value" />
     <label class="qa-toggle-label" :for="id">
       <span class="qa-toggle-outer">
         <span class="qa-toggle-inner"></span>
