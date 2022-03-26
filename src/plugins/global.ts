@@ -1,5 +1,6 @@
 import { App } from 'vue';
+import Vue3TouchEvents from 'vue3-touch-events';
 
 export default (app: App<Element>) => {
-  console.log(app.version);
+  app.use(Vue3TouchEvents);
 };

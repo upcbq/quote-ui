@@ -1,5 +1,13 @@
 <template>
-  <div class="qa-quote-session">
+  <div
+    class="qa-quote-session"
+    v-touch-options="{ swipeTolerance: 80, disableClick: true }"
+    v-touch:swipe="testSwipe"
+  >
+    <div
+      class="qa-qs-swipe-overlay"
+      :style="{ opacity: swipeIndColor ? 0.2 : 0, backgroundColor: swipeIndColor }"
+    ></div>
     <div class="qa-qs-settings">
       <button class="clear-btn qa-qs-skipped-button">
         <span class="underline">skipped&nbsp;</span>
@@ -12,9 +20,11 @@
         <Toggle
           id="auto-continue-toggle"
           v-model="autoAdvance"
+          v-if="mode === 'quote'"
           title="auto start recording"
-          >Auto Advance</Toggle
         >
+          Auto Advance
+        </Toggle>
       </div>
       <QuizCard
         class="qa-qs-card"
@@ -30,10 +40,18 @@
       ></SessionControls>
     </div>
     <div class="qa-qs-stacks">
-      <CardStackDisplay :verses="unquoted.slice(1)" class="qa-color-bg-blue">
-        Unquoted</CardStackDisplay
+      <CardStackDisplay
+        :verses="unquoted"
+        class="qa-color-bg-blue"
+        @click.prevent="setMode('quote')"
       >
-      <CardStackDisplay :verses="unreviewed" class="qa-color-bg-yellow">
+        Unquoted
+      </CardStackDisplay>
+      <CardStackDisplay
+        :verses="unreviewed"
+        class="qa-color-bg-yellow"
+        @click.prevent="setMode('review')"
+      >
         Unreviewed
       </CardStackDisplay>
       <CardStackDisplay :verses="complete" class="qa-color-bg-green">
@@ -77,19 +95,38 @@ export default defineComponent({
 
     const mode = ref<'quote' | 'review'>('quote');
 
+    const swipeIndColor = ref('');
+
     const unquoted = computed(() => {
-      return store.getters['session/unquotedVerses'];
+      const storeVal = store.getters['session/unquotedVerses'];
+      return mode.value === 'quote' ? storeVal.slice(1) : storeVal;
     });
     const unreviewed = computed(() => {
-      return store.getters['session/unreviewedVerses'];
+      const storeVal = store.getters['session/unreviewedVerses'];
+      const returnVal = [...storeVal];
+      if (mode.value === 'review') {
+        returnVal.reverse();
+      }
+      return returnVal.slice(mode.value === 'review' ? 1 : 0);
     });
     const complete = computed(() => {
       return store.getters['session/reviewedVerses'];
     });
     const activeVerseRef = computed(() => {
-      return unquoted.value?.at(0);
+      return (
+        mode.value === 'quote'
+          ? store.getters['session/unquotedVerses']
+          : [...store.getters['session/unreviewedVerses']].reverse()
+      ).at(0);
     });
     const activeVerseString = computed(() => {
+      return (
+        (mode.value === 'quote' &&
+          activeVerseRef.value &&
+          referenceToString(activeVerseRef.value)) ||
+        ''
+      );
+    });
     const activeVerseText = computed(() => {
       return (
         (mode.value === 'review' &&
@@ -107,9 +144,27 @@ export default defineComponent({
       return store.getters['session/skippedVerses'];
     });
 
-    function testQuote() {
-      if (!activeVerseRef.value) return;
-      store.dispatch('session/quoteVerse', activeVerseRef.value?.index);
+    function setMode(md: typeof mode.value) {
+      if (md === 'quote' && unquoted.value.length) {
+        mode.value = md;
+      } else if (md === 'review' && unreviewed.value.length) {
+        store.dispatch('verse/fetchVerses', unreviewed.value);
+        mode.value = md;
+      }
+    }
+
+    function testSwipe(direction: string) {
+      if (direction === 'right') {
+        swipeIndColor.value = '#00ff00';
+      } else if (direction === 'left') {
+        swipeIndColor.value = '#ff0000';
+      }
+
+      if (['right', 'left'].includes(direction)) {
+        setTimeout(() => {
+          swipeIndColor.value = '';
+        }, 250);
+      }
     }
     return {
       unquoted,
@@ -120,9 +175,11 @@ export default defineComponent({
       activeVerseText,
       autoAdvance,
       skipped,
-      testQuote,
+      testSwipe,
+      swipeIndColor,
       store,
       mode,
+      setMode,
     };
   },
 });
@@ -135,11 +192,13 @@ export default defineComponent({
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+  position: relative;
   .qa-qs-display {
     padding: 0 5%;
     margin: 0 auto;
     max-width: 700px;
     box-sizing: border-box;
+    width: 100%;
   }
   .qa-qs-card {
     width: 100%;
@@ -149,6 +208,7 @@ export default defineComponent({
     display: grid;
     grid-auto-flow: column;
     grid-auto-columns: 1fr;
+    cursor: pointer;
   }
   .qa-qs-settings {
     padding: 0 20px;
@@ -176,6 +236,13 @@ export default defineComponent({
     &:hover {
       color: var(--qa-color-font-dark);
     }
+  }
+  .qa-qs-swipe-overlay {
+    position: absolute;
+    @include position(0);
+    opacity: 0;
+    transition: transition(opacity, background-color, 0.1s, ease-in-out);
+    pointer-events: none;
   }
 }
 
