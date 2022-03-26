@@ -6,3 +6,17 @@
 .fade-leave-to {
   opacity: 0;
 }
+
+.blink {
+  animation: 1s ease-in-out 0 infinite reverse;
+}
+
+@keyframes blink {
+  from {
+    opacity: 1;
+  }
+
+  to {
+    opacity: 0;
+  }
+}

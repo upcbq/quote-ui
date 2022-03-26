@@ -36,5 +36,14 @@ export default defineComponent({
   &:hover {
     background-color: transparent;
   }
+  &:disabled {
+    background-color: transparent;
+    .qa-ib-icon {
+      color: var(--qa-color-disabled);
+      &:hover {
+        color: var(--qa-color-disabled);
+      }
+    }
+  }
 }
 </style>
