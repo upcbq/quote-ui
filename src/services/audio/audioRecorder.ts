@@ -4,6 +4,7 @@ import { Mp3MediaRecorder } from 'mp3-mediarecorder';
 import Mp3RecorderWorker from 'worker-loader!./audioRecorder.worker';
 
 export class AudioRecorder {
+  private static stream: MediaStream;
   private mediaRecorder: Mp3MediaRecorder;
   private currentRecording: Blob[];
   public isRecording = ref<boolean>(false);
@@ -21,7 +22,10 @@ export class AudioRecorder {
    * Create a new AudioRecorder
    */
   public static async initialize(): Promise<AudioRecorder> {
-    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    if (!this.stream) {
+      this.stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    }
+    const stream = this.stream;
 
     return new AudioRecorder(stream);
   }
