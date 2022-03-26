@@ -63,5 +63,11 @@ export default defineComponent({
       top: 0;
     }
   }
+
+  @include media-short() {
+    .qa-cs-card {
+      width: 70%;
+    }
+  }
 }
 </style>

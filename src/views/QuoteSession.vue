@@ -186,4 +186,13 @@ export default defineComponent({
     }
   }
 }
+
+@include media-short() {
+  .qa-quote-session {
+    .qa-qs-card {
+      width: unset;
+      max-height: 30vh;
+    }
+  }
+}
 </style>

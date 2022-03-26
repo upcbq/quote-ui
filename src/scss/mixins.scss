@@ -195,3 +195,16 @@ $screens: (
     @content;
   }
 }
+
+@mixin media-short() {
+  @media (orientation: landscape) and (max-height: 750px) {
+    @content;
+  }
+}
+
+@mixin position($top, $right: $top, $bottom: $top, $left: $right) {
+  top: $top;
+  right: $right;
+  bottom: $bottom;
+  left: $left;
+}
