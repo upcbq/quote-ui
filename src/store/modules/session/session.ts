@@ -1,9 +1,13 @@
 import { VerseListResponse } from '@/api/modules/verseList/verseListApi.interfaces';
 import { IReference } from '@/api/types';
 import { RootState, StoreType } from '@/store/store.interfaces';
-import { indexArray, shuffle as shuffleArr } from '@/utilities/utilityFunctions';
+import {
+  indexArray,
+  mergeDefault,
+  shuffle as shuffleArr,
+} from '@/utilities/utilityFunctions';
 import { ActionContext, Module } from 'vuex';
-import { SessionCompleteVerse, SessionState } from './session.interfaces';
+import { SessionCompleteVerse, SessionState, VerseCheat } from './session.interfaces';
 import { v4 as uuidv4 } from 'uuid';
 import { AudioDb } from '@/storage/audio.db';
 
@@ -20,6 +24,16 @@ export const SessionStoreState: () => SessionState = () => ({
   },
   id: '',
 });
+
+const defaultComplete: SessionCompleteVerse = {
+  recorded: false,
+  reviewed: false,
+  correct: false,
+  skipped: false,
+  index: -1,
+  cheats: [],
+  order: -1,
+};
 
 export const SessionStoreMutations = {
   setSelectedVerseListId(
@@ -62,6 +76,15 @@ export const SessionStoreMutations = {
   resetSessionId(state: SessionState) {
     state.id = '';
   },
+  setBatchSize(state: SessionState, batchSize: SessionState['options']['batchSize']) {
+    state.options.batchSize = batchSize;
+  },
+  setPlaybackSpeed(
+    state: SessionState,
+    playbackSpeed: SessionState['options']['playbackSpeed']
+  ) {
+    state.options.playbackSpeed = playbackSpeed;
+  },
 };
 
 export const SessionStoreActions = {
@@ -73,23 +96,38 @@ export const SessionStoreActions = {
     );
   },
   quoteVerse(
-    { commit, getters }: ActionContext<SessionState, RootState>,
+    { commit, getters, state }: ActionContext<SessionState, RootState>,
     verseIndex: number
   ) {
     const order = getters.unquotedVerses.length;
     commit('setComplete', {
-      key: verseIndex,
-      complete: {
-        reviewed: false,
-        correct: false,
-        skipped: false,
+      index: verseIndex,
+      complete: mergeDefault(defaultComplete, state.complete[verseIndex], {
         index: verseIndex,
         order,
-      },
+        recorded: true,
+      }),
     });
   },
-  unquoteVerse({ state }: ActionContext<SessionState, RootState>, verseIndex: number) {
-    delete state.complete[verseIndex];
+  unquoteVerse(
+    { state, commit, getters }: ActionContext<SessionState, RootState>,
+    verseIndex: number
+  ) {
+    const cheats: VerseCheat[] = getters.cheats || [];
+    const cheatsWithoutReplace = cheats.filter((c) => c.type !== 'replace');
+    const replaceCheat = cheats.find((c) => c.type === 'replace') || {
+      type: 'replace',
+      amount: 0,
+    };
+    replaceCheat.amount++;
+
+    commit('setComplete', {
+      key: verseIndex,
+      complete: mergeDefault(defaultComplete, state.complete[verseIndex], {
+        recorded: false,
+        cheats: [...cheatsWithoutReplace, replaceCheat],
+      }),
+    });
   },
   reviewVerse(
     { commit, state }: ActionContext<SessionState, RootState>,
@@ -158,6 +196,55 @@ export const SessionStoreActions = {
     commit('setSelectedVerseListId', '');
     commit('setOrder', []);
   },
+  // Cheats below here
+  giveStartWord(
+    { commit, getters, state }: ActionContext<SessionState, RootState>,
+    verseIndex: number
+  ) {
+    const complete = state.complete[verseIndex] as undefined | SessionCompleteVerse;
+    const cheats = complete?.cheats.filter((c) => c.type !== 'firstWord') || [];
+    const firstWordCheat = complete?.cheats.find((c) => c.type === 'firstWord') || {
+      type: 'firstWord',
+      amount: 0,
+    };
+    firstWordCheat.amount++;
+
+    const order =
+      complete?.order !== undefined && complete.order > -1
+        ? complete.order
+        : getters.unquotedVerses.length;
+
+    commit('setComplete', {
+      index: verseIndex,
+      complete: mergeDefault(defaultComplete, state.complete[verseIndex], {
+        index: verseIndex,
+        order,
+        cheats: [...cheats, firstWordCheat],
+      }),
+    });
+  },
+  markIncompleteListen(
+    { commit, state }: ActionContext<SessionState, RootState>,
+    { verseIndex, percent }: { verseIndex: number; percent: number }
+  ) {
+    const complete = state.complete[verseIndex] as SessionCompleteVerse | undefined;
+    const cheats = complete?.cheats || [];
+    const cheatsWithoutIncompleteListen = cheats.filter(
+      (c) => c.type === 'incompleteListen'
+    );
+    commit('setComplete', {
+      index: verseIndex,
+      complete: mergeDefault(defaultComplete, state.complete[verseIndex], {
+        cheats: [
+          ...cheatsWithoutIncompleteListen,
+          {
+            type: 'incompleteListen',
+            amount: percent,
+          },
+        ],
+      }),
+    });
+  },
 };
 
 export const SessionStoreGetters = {
@@ -198,7 +285,7 @@ export const SessionStoreGetters = {
     const orderedVerses = getters.orderedVerses;
     return (
       orderedVerses?.filter((v) => {
-        return !state.complete[v.index];
+        return !state.complete[v.index]?.recorded;
       }) || []
     );
   },
@@ -275,6 +362,23 @@ export const SessionStoreGetters = {
       .sort((a, b) => a.order - b.order)
       .map((cv) => limitedVerses.at(cv.index))
       .filter((ref) => !!ref) as IReference[];
+  },
+  cheats(state: SessionState) {
+    return (verseIndex: number) => {
+      const complete = state.complete[verseIndex] as SessionCompleteVerse | undefined;
+      return complete?.cheats || [];
+    };
+  },
+  cheatType(
+    state: SessionState,
+    getters: {
+      cheats: (verseIndex: number) => VerseCheat[];
+    }
+  ) {
+    return (verseIndex: number, type: VerseCheat['type']) => {
+      const cheats = getters.cheats(verseIndex);
+      return cheats.find((c) => c.type === type);
+    };
   },
 };
 

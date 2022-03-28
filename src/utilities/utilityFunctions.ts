@@ -27,3 +27,19 @@ export function indexArray(length: number) {
 export function boundedNumber(num: number, min: number = num, max: number = num) {
   return Math.min(Math.max(min, num), max);
 }
+
+export function mergeDefault<T extends object>(
+  defaultData: T,
+  currentData: T | undefined,
+  newData: Partial<T>
+) {
+  return currentData
+    ? {
+        ...currentData,
+        ...newData,
+      }
+    : {
+        ...defaultData,
+        ...newData,
+      };
+}

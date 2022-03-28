@@ -5,12 +5,19 @@ import {
   SessionStoreMutations,
 } from './session';
 
+export interface VerseCheat {
+  type: 'firstWord' | 'incompleteListen' | 'replace';
+  amount: number;
+}
+
 export interface SessionCompleteVerse {
+  recorded: boolean;
   correct: boolean;
   reviewed: boolean;
   skipped: boolean;
   order: number;
   index: number;
+  cheats: VerseCheat[];
 }
 
 export interface SessionOptions {
