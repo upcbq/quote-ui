@@ -8,6 +8,7 @@
         audioPlayback?.playing.value ? audioPlayback?.pause() : audioPlayback?.play()
       "
       tabindex="-1"
+      :disabled="disabled"
     />
     <div
       class="qa-ap-progress"
@@ -35,7 +36,12 @@
     <span class="qa-ap-time">
       {{ secondsDisplay }}
     </span>
-    <button class="clear-btn qa-ap-rate" @keyup.stop @click.prevent="adjustPlaybackRate">
+    <button
+      class="clear-btn qa-ap-rate"
+      @keyup.stop
+      @click.prevent="adjustPlaybackRate"
+      :disabled="disabled"
+    >
       <span>{{ rateDisplay }}x</span>
     </button>
   </div>
@@ -43,7 +49,7 @@
 
 <script lang="ts">
 import { AudioPlayback } from '@/services/audio/audioPlayback';
-import { computed, defineComponent, onMounted, ref, shallowRef } from 'vue';
+import { computed, defineComponent, onMounted, ref, shallowRef, watch } from 'vue';
 import IconButton from '@/components/molecules/IconButton.vue';
 import debounce from 'lodash/debounce';
 
@@ -54,19 +60,35 @@ export default defineComponent({
       type: String,
       default: '',
     },
+    disabled: {
+      type: Boolean,
+      default: false,
+    },
+    autoPlay: {
+      type: Boolean,
+      default: false,
+    },
   },
-  setup() {
+  emits: {
+    'update:autoPlay': null,
+  },
+  setup(props, ctx) {
     // Element refs
     const playerEl = ref<HTMLElement>();
     const audioEl = ref<HTMLAudioElement>();
 
     // Audio state
     const audioPlayback = shallowRef<AudioPlayback | undefined>(undefined);
-    onMounted(() => {
+    function updateAudioPlayback() {
       if (audioEl.value) {
         audioPlayback.value = new AudioPlayback(audioEl.value);
       }
+    }
+    onMounted(() => {
+      updateAudioPlayback();
     });
+
+    watch(audioEl, updateAudioPlayback);
 
     /**
      * The percent between 0 and 1 of the audio track's playback
@@ -131,7 +153,7 @@ export default defineComponent({
      * Handle a drag mouse or touch event for progress bar
      */
     function drag(e: MouseEvent | TouchEvent) {
-      if (!dragging.value) return;
+      if (!dragging.value || props.disabled) return;
       const dragAmount = calculatePercent(e);
       if (typeof dragAmount === 'number') {
         dragPercent.value = dragAmount;
@@ -161,6 +183,7 @@ export default defineComponent({
      * Handle a touch down or mouse down event for progress bar
      */
     function down(e: MouseEvent | TouchEvent) {
+      // if (props.disabled) return;
       playerEl.value?.focus();
       if (window.TouchEvent && e instanceof TouchEvent && e.touches.length > 1) return;
       dragging.value = true;
@@ -184,6 +207,7 @@ export default defineComponent({
      * Handle keyboard events for player
      */
     function handleKey(e: KeyboardEvent) {
+      if (props.disabled) return;
       const key = e.key;
       switch (key) {
         case ' ':
@@ -225,6 +249,20 @@ export default defineComponent({
       trailing: false,
     });
 
+    watch(
+      () => props.src,
+      () => {
+        if (props.autoPlay && audioPlayback.value) {
+          setTimeout(() => {
+            if (props.autoPlay && audioPlayback.value) {
+              audioPlayback.value.play();
+              ctx.emit('update:autoPlay', false);
+            }
+          }, 100);
+        }
+      }
+    );
+
     return {
       playerEl,
       audioEl,
@@ -253,6 +291,7 @@ export default defineComponent({
   border-radius: 1000px;
   min-width: 100px;
   height: 40px;
+  box-sizing: border-box;
   display: flex;
   flex-flow: row nowrap;
   align-items: center;
@@ -284,6 +323,10 @@ export default defineComponent({
     align-items: center;
     margin-right: -6px;
     margin-left: 8px;
+
+    &:disabled {
+      background-color: var(--qa-color-disabled);
+    }
   }
 
   .qa-ap-progress {
