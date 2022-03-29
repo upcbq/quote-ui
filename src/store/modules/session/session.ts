@@ -101,7 +101,7 @@ export const SessionStoreActions = {
   ) {
     const order = getters.unquotedVerses.length;
     commit('setComplete', {
-      index: verseIndex,
+      key: verseIndex,
       complete: mergeDefault(defaultComplete, state.complete[verseIndex], {
         index: verseIndex,
         order,
@@ -215,7 +215,7 @@ export const SessionStoreActions = {
         : getters.unquotedVerses.length;
 
     commit('setComplete', {
-      index: verseIndex,
+      key: verseIndex,
       complete: mergeDefault(defaultComplete, state.complete[verseIndex], {
         index: verseIndex,
         order,
@@ -233,7 +233,7 @@ export const SessionStoreActions = {
       (c) => c.type === 'incompleteListen'
     );
     commit('setComplete', {
-      index: verseIndex,
+      key: verseIndex,
       complete: mergeDefault(defaultComplete, state.complete[verseIndex], {
         cheats: [
           ...cheatsWithoutIncompleteListen,
@@ -244,6 +244,19 @@ export const SessionStoreActions = {
         ],
       }),
     });
+  },
+  // Temporary for debugging
+  // TODO: remove
+  markAllUnreviewed({ commit, state }: ActionContext<SessionState, RootState>) {
+    const complete = { ...state.complete };
+    for (const key in complete) {
+      complete[key] = {
+        ...complete[key],
+        correct: false,
+        reviewed: false,
+      };
+    }
+    commit('setAllComplete', complete);
   },
 };
 
