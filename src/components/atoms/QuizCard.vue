@@ -3,7 +3,11 @@
     <rect x="0" y="0" width="200" height="100"></rect>
     <foreignObject width="100%" height="100%">
       <div xmlns="http://www.w3.org/1999/xhtml" class="ref-text-container">
-        <p class="ref-text" v-if="refText">
+        <p
+          class="ref-text"
+          v-if="refText"
+          :class="{ 'qa-qc-ref--with-verse': !!verseText }"
+        >
           {{ refText }}
         </p>
         <p
@@ -69,12 +73,23 @@ export default defineComponent({
     justify-content: center;
     height: 100px;
     width: 200px;
+    position: relative;
   }
 
   .ref-text {
     font-family: 'Noto Serif', 'Times New Roman', Times, serif;
     font-size: 16px;
     width: 100%;
+  }
+
+  .qa-qc-ref--with-verse {
+    color: var(--qa-color-white--darken-30);
+    position: absolute;
+    width: auto;
+    left: 0;
+    top: 0;
+    margin: 2px 0 0 2px;
+    font-size: 8px;
   }
 
   .verse-text {
@@ -84,11 +99,15 @@ export default defineComponent({
     text-align: left;
     padding: 10px;
     box-sizing: border-box;
+    margin: 0;
   }
 
   @include media-smaller(xs) {
     .ref-text {
       font-size: 22px;
+    }
+    .qa-qc-ref--with-verse {
+      font-size: 8px;
     }
   }
 }
