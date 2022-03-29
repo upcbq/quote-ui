@@ -13,14 +13,13 @@
         <span class="underline">skipped&nbsp;</span>
         <span>({{ skipped.length }})</span>
       </button>
-      <IconButton icon="settings">Test</IconButton>
+      <IconButton icon="settings"></IconButton>
     </div>
     <div class="qa-qs-display">
       <div class="qa-qs-top-controls">
         <Toggle
           id="auto-continue-toggle"
           v-model="autoAdvance"
-          v-if="mode === 'quote'"
           title="auto start recording"
         >
           Auto Advance
@@ -120,12 +119,7 @@ export default defineComponent({
       ).at(0);
     });
     const activeVerseString = computed(() => {
-      return (
-        (mode.value === 'quote' &&
-          activeVerseRef.value &&
-          referenceToString(activeVerseRef.value)) ||
-        ''
-      );
+      return (activeVerseRef.value && referenceToString(activeVerseRef.value)) || '';
     });
     const activeVerseText = computed(() => {
       return (
