@@ -40,7 +40,7 @@ export default defineComponent({
   align-items: center;
   line-height: 1em;
   box-sizing: border-box;
-  height: 38px;
+  height: 40px;
   &.border {
     border: 2px solid var(--qa-record-button-color);
   }

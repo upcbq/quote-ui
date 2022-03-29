@@ -1,5 +1,11 @@
 <template>
-  <div class="qa-session-controls">
+  <div
+    class="qa-session-controls"
+    :class="{
+      'qa-sc--quote-controls': mode === 'quote',
+      'qa-sc--review-controls': mode === 'review',
+    }"
+  >
     <template v-if="mode === 'quote'">
       <IconButton
         :icon="shuffle ? 'shuffle_on' : 'shuffle'"
@@ -35,21 +41,35 @@
       >
       </IconButton>
     </template>
-    <template v-else-if="mode === 'review'"> Review controls </template>
+    <template v-else-if="mode === 'review'">
+      <RecordButton icon="close" class="qa-sc-incorrect" @click.prevent="review(false)">
+        {{ $mqs.xs ? '' : 'Incorrect' }}
+      </RecordButton>
+      <AudioPlayer
+        :src="audioSrc"
+        :disabled="!audioSrc"
+        class="qa-sc-player"
+        v-model:autoPlay="autoPlay"
+      />
+      <RecordButton icon="check" class="qa-sc-correct" @click.prevent="review(false)">
+        {{ $mqs.xs ? '' : 'Correct' }}
+      </RecordButton>
+    </template>
   </div>
 </template>
 
 <script lang="ts">
 import { useStore } from '@/store/store';
-import { computed, defineComponent, onMounted, shallowRef } from 'vue';
+import { computed, defineComponent, onMounted, ref, shallowRef, watch } from 'vue';
 import IconButton from '@/components/molecules/IconButton.vue';
 import RecordButton from '@/components/molecules/RecordButton.vue';
 import { AudioRecorder } from '@/services/audio/audioRecorder';
 import { AudioDb } from '@/storage/audio.db';
+import AudioPlayer from './AudioPlayer.vue';
 
 export default defineComponent({
   name: 'SessionControls',
-  components: { IconButton, RecordButton },
+  components: { IconButton, RecordButton, AudioPlayer },
   emits: {
     recordStart: null,
     recordStop: null,
@@ -69,6 +89,8 @@ export default defineComponent({
       get: () => store.state.session.shuffle,
       set: (value) => store.dispatch('session/shuffle', value),
     });
+
+    const autoPlay = ref(false);
 
     const autoAdvance = computed(() => store.state.session.options.autoAdvance);
 
@@ -131,8 +153,41 @@ export default defineComponent({
 
     const isRecording = computed(() => !!audioRecorder.value?.isRecording.value);
 
+    async function review(correct: boolean) {
+      store.dispatch('session/reviewVerse', {
+        verseIndex: props.currentIndex,
+        correct,
+      });
+
+      autoPlay.value = autoAdvance.value;
+    }
+
+    const audioSrc = ref('');
+
+    async function updateAudioSrc() {
+      audioSrc.value = '';
+      if (props.mode === 'review') {
+        const sessionId = store.state.session.id;
+        if (sessionId) {
+          AudioDb.getAudio(sessionId, props.currentIndex).then((audioRecording) => {
+            if (audioRecording) {
+              const blob = new Blob([audioRecording.audio.data], {
+                type: audioRecording.audio.type,
+              });
+              audioSrc.value = URL.createObjectURL(blob);
+            }
+          });
+        }
+      }
+    }
+
+    watch([() => props.currentIndex, () => props.mode], async () => {
+      await updateAudioSrc();
+    });
+
     onMounted(() => {
       AudioDb.initialize();
+      updateAudioSrc();
     });
 
     return {
@@ -143,6 +198,9 @@ export default defineComponent({
       next,
       audioRecorder,
       isRecording,
+      audioSrc,
+      review,
+      autoPlay,
     };
   },
 });
@@ -154,6 +212,10 @@ export default defineComponent({
   flex-direction: row;
   align-items: center;
   justify-content: space-between;
+
+  &.qa-sc--review-controls {
+    gap: 10px;
+  }
 
   .qa-sc-recording-cancel {
     --qa-record-button-color: var(--qa-color-white);
@@ -177,15 +239,48 @@ export default defineComponent({
     flex-flow: row nowrap;
     gap: 10px;
   }
+
+  .qa-sc-player {
+    flex-grow: 1;
+  }
+
+  .qa-sc-incorrect,
+  .qa-sc-correct {
+    font-size: 24px;
+    .qa-rb-text {
+      font-size: 0.7em;
+    }
+  }
+
+  .qa-sc-incorrect {
+    --qa-record-button-color: var(--qa-color-white);
+    --qa-record-button-bg-color: var(--qa-color-red);
+    --qa-record-button-font-color: var(--qa-color-white);
+  }
+
+  .qa-sc-correct {
+    --qa-record-button-color: var(--qa-color-white);
+    --qa-record-button-bg-color: var(--qa-color-green);
+    --qa-record-button-font-color: var(--qa-color-white);
+  }
+
   @include media-larger(xs) {
     .qa-sc-recording-next,
-    .qa-sc-recording-cancel {
+    .qa-sc-recording-cancel,
+    .qa-sc-incorrect,
+    .qa-sc-correct {
       padding-right: 12px;
+    }
+    .qa-sc-incorrect,
+    .qa-sc-correct {
+      height: 32px;
     }
   }
   @include media-smaller(xs) {
     .qa-sc-recording-next,
-    .qa-sc-recording-cancel {
+    .qa-sc-recording-cancel,
+    .qa-sc-incorrect,
+    .qa-sc-correct {
       font-size: 31.333px;
       padding: 0.1em;
       .qa-rb-text {
