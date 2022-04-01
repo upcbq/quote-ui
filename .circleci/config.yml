@@ -31,7 +31,7 @@ jobs:
       - run:
           name: Build application Docker image
           command: |
-            docker build --cache-from=app -f ./docker/node/Dockerfile -t quote-ui .
+            docker build --cache-from=app --build-arg PORT=80 -f ./docker/node/Dockerfile -t quote-ui .
       - run:
           name: Save Docker image layer cache
           command: |
