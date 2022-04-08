@@ -53,7 +53,7 @@
       >
         Unreviewed
       </CardStackDisplay>
-      <CardStackDisplay :verses="complete" class="qa-color-bg-green">
+      <CardStackDisplay :verses="complete" class="qa-color-bg-blue">
         Complete
       </CardStackDisplay>
     </div>
