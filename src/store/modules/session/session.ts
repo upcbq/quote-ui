@@ -17,6 +17,7 @@ export const SessionStoreState: () => SessionState = () => ({
   complete: {},
   order: [],
   shuffle: false,
+  organization: '',
   options: {
     autoAdvance: false,
     batchSize: -1,
@@ -271,7 +272,7 @@ export const SessionStoreGetters = {
     ];
   },
   limitedVerses(state: SessionState, getters: { verseList: VerseListResponse }) {
-    return getters.verseList?.verses?.slice(0, state.finalVerseIndex + 1) || [];
+    return getters.verseList?.verses?.slice(0, state.finalVerseIndex) || [];
   },
   orderedVerses(
     state: SessionState,
@@ -298,7 +299,7 @@ export const SessionStoreGetters = {
     const orderedVerses = getters.orderedVerses;
     return (
       orderedVerses?.filter((v) => {
-        return !state.complete[v.index]?.recorded;
+        return !state.complete[v.index]?.recorded && !state.complete[v.index]?.skipped;
       }) || []
     );
   },

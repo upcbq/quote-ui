@@ -13,6 +13,8 @@ export class AudioPlayback {
     set: (value) => this.seek(value),
   });
 
+  public maxListened = ref<number>(0);
+
   // Allows setting the playback rate of the player
   private playbackRateRef = ref<number>(1);
   public playbackRate = computed({
@@ -25,6 +27,7 @@ export class AudioPlayback {
     this.duration.value = this.audio.duration;
     this.secondsRef.value = this.audio.currentTime;
     this.playbackRateRef.value = this.audio.playbackRate;
+    this.maxListened.value = 0;
 
     // Add listeners to update our various refs
     this.audio.addEventListener('play', () => {
@@ -33,12 +36,17 @@ export class AudioPlayback {
     this.audio.addEventListener('ended', () => {
       this.playing.value = false;
       this.secondsRef.value = 0;
+      this.maxListened.value = 1;
     });
     this.audio.addEventListener('pause', () => {
       this.playing.value = false;
     });
     this.audio.addEventListener('timeupdate', () => {
       this.secondsRef.value = this.audio.currentTime;
+
+      // TODO: this won't work. Need to check if greater than last and also reset on new audio load
+      this.maxListened.value =
+        Math.round((this.secondsRef.value / this.duration.value) * 100) / 100;
     });
     this.audio.addEventListener('ratechange', () => {
       this.playbackRateRef.value = this.audio.playbackRate;

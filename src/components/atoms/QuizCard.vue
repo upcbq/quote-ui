@@ -5,18 +5,26 @@
       <div xmlns="http://www.w3.org/1999/xhtml" class="ref-text-container">
         <p
           class="ref-text"
-          v-if="refText"
+          v-if="refText && (!spinner || !!verseText)"
           :class="{ 'qa-qc-ref--with-verse': !!verseText }"
         >
           {{ refText }}
         </p>
         <p
           class="verse-text"
-          v-if="verseText"
+          v-if="verseText && !spinner"
           :style="{ fontSize: `${verseTextFontSize}px` }"
         >
           {{ verseText }}
         </p>
+        <p
+          class="verse-text"
+          v-if="spinner"
+          :style="{ fontSize: `${verseTextFontSize}px` }"
+        >
+          <PlaceholderParagraph :length="120" />
+        </p>
+        <Spinner class="qa-qc-spinner" v-if="spinner" :delay="0" />
       </div>
     </foreignObject>
   </svg>
@@ -25,9 +33,15 @@
 <script lang="ts">
 import { computed, defineComponent } from 'vue';
 import { boundedNumber } from '@/utilities/utilityFunctions';
+import Spinner from '@/components/atoms/Spinner.vue';
+import PlaceholderParagraph from '@/components/structure/PlaceholderParagraph.vue';
 
 export default defineComponent({
   name: 'QaQuizCard',
+  components: {
+    Spinner,
+    PlaceholderParagraph,
+  },
   props: {
     verseText: {
       type: String,
@@ -37,10 +51,14 @@ export default defineComponent({
       type: String,
       default: '',
     },
+    spinner: {
+      type: Boolean,
+      default: false,
+    },
   },
   setup(props) {
     const verseTextFontSize = computed(() => {
-      const textLength = props.verseText.length;
+      const textLength = props.spinner ? 120 : props.verseText.length;
       let size = 16;
       let computedColumns = 180 / size;
       let computedRows = textLength / computedColumns;
@@ -100,6 +118,21 @@ export default defineComponent({
     padding: 10px;
     box-sizing: border-box;
     margin: 0;
+  }
+
+  .qa-qc-spinner {
+    width: 30px;
+    height: 30px;
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+
+    --qa-color-secondary: var(--qa-color-font-dark);
+
+    &::after {
+      border-width: 3px;
+    }
   }
 
   @include media-smaller(xs) {

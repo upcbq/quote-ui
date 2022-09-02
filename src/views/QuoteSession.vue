@@ -30,6 +30,7 @@
         v-if="activeVerseRef"
         :ref-text="activeVerseString"
         :verse-text="activeVerseText"
+        :spinner="spinner"
       >
       </QuizCard>
       <SessionControls
@@ -62,7 +63,7 @@
 
 <script lang="ts">
 import { useStore } from '@/store/store';
-import { computed, defineComponent, ref } from 'vue';
+import { computed, defineComponent, ref, watch } from 'vue';
 import { useRouter } from 'vue-router';
 import { PATH } from '@/router/router';
 import QuizCard from '@/components/atoms/QuizCard.vue';
@@ -95,6 +96,8 @@ export default defineComponent({
     const mode = ref<'quote' | 'review'>('quote');
 
     const swipeIndColor = ref('');
+
+    const spinner = ref<boolean>(false);
 
     const unquoted = computed(() => {
       const storeVal = store.getters['session/unquotedVerses'];
@@ -142,7 +145,10 @@ export default defineComponent({
       if (md === 'quote' && unquoted.value.length) {
         mode.value = md;
       } else if (md === 'review' && unreviewed.value.length) {
-        store.dispatch('verse/fetchVerses', unreviewed.value);
+        spinner.value = true;
+        store.dispatch('verse/fetchVerses', unreviewed.value).then(() => {
+          spinner.value = false;
+        });
         mode.value = md;
       }
     }
@@ -160,6 +166,15 @@ export default defineComponent({
         }, 250);
       }
     }
+
+    watch(unreviewed, () => {
+      if (
+        store.getters['session/unreviewedVerses'].length === 0 &&
+        mode.value === 'review'
+      ) {
+        setMode('quote');
+      }
+    });
     return {
       unquoted,
       unreviewed,
@@ -174,6 +189,7 @@ export default defineComponent({
       store,
       mode,
       setMode,
+      spinner,
     };
   },
 });

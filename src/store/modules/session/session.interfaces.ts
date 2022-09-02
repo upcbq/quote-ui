@@ -34,6 +34,7 @@ export interface SessionState {
   shuffle: boolean;
   options: SessionOptions;
   id: string;
+  organization: string;
 }
 
 type SessionNamespace<N extends string> = `session/${N}`;

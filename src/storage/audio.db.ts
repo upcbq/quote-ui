@@ -46,6 +46,12 @@ export class AudioDb {
     return this.db.removeItem(`${sessionId}-${verseIndex}`);
   }
 
+  public static async deleteMultipleAudio(sessionId: string, verseIndexes: number[]) {
+    for (const verseIndex of verseIndexes) {
+      await this.deleteAudio(sessionId, verseIndex);
+    }
+  }
+
   public static async getAllSessionAudio(
     sessionId: string
   ): Promise<Record<string, IDbAudio>> {

@@ -76,7 +76,7 @@ export default defineComponent({
   .el-content {
     width: 100%;
     flex-grow: 1;
-    overflow-y: scroll;
+    overflow-y: auto;
   }
 }
 </style>

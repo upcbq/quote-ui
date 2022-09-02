@@ -43,3 +43,26 @@ export function mergeDefault<T extends object>(
         ...newData,
       };
 }
+
+export function roundTo(num: number, precision: number) {
+  const mult = 10 ^ precision;
+  return Math.round((num + Number.EPSILON) * mult) / mult;
+}
+
+export function randomNormalDist() {
+  const u = 1 - Math.random(); //Converting [0,1) to (0,1)
+  const v = Math.random();
+  return (
+    boundedNumber(Math.sqrt(-2.0 * Math.log(u)) * Math.cos(2.0 * Math.PI * v) + 3, 0, 6) /
+    6
+  );
+}
+
+export function generatePlaceholderText(length: number, averageWordLength = 12) {
+  let dummyText = '';
+  while (dummyText.length < length) {
+    const wordLength = Math.max(1, Math.round(averageWordLength * randomNormalDist()));
+    dummyText += '█'.repeat(wordLength) + ' ';
+  }
+  return dummyText.slice(0, length);
+}

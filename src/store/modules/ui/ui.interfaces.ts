@@ -6,8 +6,9 @@ export interface OverlayConfig {
   id: string;
   type: 'drawer' | 'modal' | 'fullscreen';
   component?: string | Component;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   componentAttr?: Record<string, any>;
-  componentListeners?: any;
+  componentListeners?: Record<string, () => void>;
   componentClasses?: Record<string, boolean> | string;
   closeButton?: boolean;
   zIndex?: number;
@@ -31,7 +32,7 @@ export interface ModalConfig extends OverlayConfig {
   body?: string;
   mainButton?: string;
   secondaryButton?: string;
-  modalListeners?: any;
+  modalListeners?: Record<string, () => void>;
 }
 
 export interface FullscreenOverlayConfig extends OverlayConfig {

@@ -6,8 +6,8 @@ export class VerseListApi extends ApiModule {
     super(baseUrl, '/verseList');
   }
 
-  public async getVerseLists() {
-    return this.get<VerseListLimitedResponse[]>('');
+  public async getVerseLists(organization?: string) {
+    return this.get<VerseListLimitedResponse[]>('', { params: { organization } });
   }
 
   public async getVerseList(verseListId: string) {
