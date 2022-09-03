@@ -63,6 +63,9 @@ export const SessionStoreMutations = {
       delete state.complete[key];
     }
   },
+  setAllComplete(state: SessionState, complete: SessionState['complete']) {
+    state.complete = complete;
+  },
   resetComplete(state: SessionState) {
     state.complete = {};
   },

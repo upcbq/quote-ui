@@ -50,6 +50,7 @@
         :disabled="!audioSrc"
         class="qa-sc-player"
         v-model:autoPlay="autoPlay"
+        v-model:speed="speed"
       />
       <RecordButton icon="check" class="qa-sc-correct" @click.prevent="review(false)">
         {{ $mqs.xs ? '' : 'Correct' }}
@@ -181,6 +182,11 @@ export default defineComponent({
       }
     }
 
+    const speed = computed({
+      get: () => store.state.session.options.playbackSpeed || 1,
+      set: (speed: number) => store.commit('session/setPlaybackSpeed', speed),
+    });
+
     watch([() => props.currentIndex, () => props.mode], async () => {
       await updateAudioSrc();
     });
@@ -201,6 +207,7 @@ export default defineComponent({
       audioSrc,
       review,
       autoPlay,
+      speed,
     };
   },
 });

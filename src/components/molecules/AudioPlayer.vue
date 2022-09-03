@@ -7,6 +7,7 @@
       @click.prevent="
         audioPlayback?.playing.value ? audioPlayback?.pause() : audioPlayback?.play()
       "
+      @keydown.prevent="() => {}"
       tabindex="-1"
       :disabled="disabled"
     />
@@ -42,7 +43,21 @@
       @click.prevent="adjustPlaybackRate"
       :disabled="disabled"
     >
-      <span>{{ rateDisplay }}x</span>
+      <span
+        ><span
+          v-if="rateDisplay.integer !== '0'"
+          :class="{ 'qa-ap-rate-text': rateDisplay.decimal }"
+          >{{ rateDisplay.integer }}</span
+        ><span
+          v-if="rateDisplay.decimal"
+          :class="{ 'qa-ap-rate-text': rateDisplay.integer !== '0' }"
+          >.</span
+        ><span
+          :class="{ 'qa-ap-rate-decimal qa-ap-rate-text': rateDisplay.integer !== '0' }"
+          v-if="rateDisplay.decimal"
+          >{{ rateDisplay.decimal }}</span
+        >x</span
+      >
     </button>
   </div>
 </template>
@@ -52,6 +67,9 @@ import { AudioPlayback } from '@/services/audio/audioPlayback';
 import { computed, defineComponent, onMounted, ref, shallowRef, watch } from 'vue';
 import IconButton from '@/components/molecules/IconButton.vue';
 import debounce from 'lodash/debounce';
+import { chooseNearest, roundTo } from '@/utilities/utilityFunctions';
+
+const playbackRates = [1, 1.5, 2, 0.5];
 
 export default defineComponent({
   name: 'AudioPlayer',
@@ -68,9 +86,14 @@ export default defineComponent({
       type: Boolean,
       default: false,
     },
+    speed: {
+      type: Number,
+      default: 1,
+    },
   },
   emits: {
     'update:autoPlay': null,
+    'update:speed': null,
   },
   setup(props, ctx) {
     // Element refs
@@ -82,6 +105,10 @@ export default defineComponent({
     function updateAudioPlayback() {
       if (audioEl.value) {
         audioPlayback.value = new AudioPlayback(audioEl.value);
+        if (props.speed && audioPlayback.value) {
+          audioPlayback.value.playbackRate.value =
+            chooseNearest(props.speed, playbackRates) || 1;
+        }
       }
     }
     onMounted(() => {
@@ -114,21 +141,28 @@ export default defineComponent({
      * The string to display in the playback rate button
      */
     const rateDisplay = computed(() => {
-      const value =
-        Math.round((audioPlayback.value?.playbackRate.value || 1) * 100) / 100;
-      return value.toString().replace(/^0\./, '.');
+      const value = roundTo(audioPlayback.value?.playbackRate.value || 1, 1);
+      const splitValue = value.toString().split('.');
+      return {
+        integer: splitValue.at(0),
+        decimal: splitValue.at(1),
+      };
     });
 
     /**
-     * Function to adjust the playback rate; goes 1, 2, 4, 0.5, and loops.
+     * Function to adjust the playback rate
      */
     function adjustPlaybackRate() {
       if (audioPlayback.value) {
-        if (audioPlayback.value.playbackRate.value < 4) {
-          audioPlayback.value.playbackRate.value *= 2;
+        const index = playbackRates.indexOf(audioPlayback.value.playbackRate.value);
+        if (index === -1) {
+          audioPlayback.value.playbackRate.value = playbackRates[0];
         } else {
-          audioPlayback.value.playbackRate.value = 0.5;
+          audioPlayback.value.playbackRate.value =
+            playbackRates[(index + 1) % playbackRates.length];
         }
+
+        ctx.emit('update:speed', audioPlayback.value.playbackRate);
       }
     }
 
@@ -200,7 +234,10 @@ export default defineComponent({
      * Calculate the positive or negative time to seek
      */
     function seekTime(forward: boolean, fast: boolean, totalDuration: number) {
-      return Math.min(10, totalDuration * (fast ? 0.1 : 0.05)) * (forward ? 1 : -1);
+      return (
+        Math.max(1, Math.min(10, totalDuration * (fast ? 0.1 : 0.05))) *
+        (forward ? 1 : -1)
+      );
     }
 
     /**
@@ -259,6 +296,24 @@ export default defineComponent({
               ctx.emit('update:autoPlay', false);
             }
           }, 100);
+        }
+        if (props.speed && audioPlayback.value) {
+          setTimeout(() => {
+            if (props.speed && audioPlayback.value) {
+              audioPlayback.value.playbackRate.value =
+                chooseNearest(props.speed, playbackRates) || 1;
+            }
+          }, 100);
+        }
+      }
+    );
+
+    watch(
+      () => props.speed,
+      () => {
+        if (props.speed && audioPlayback.value) {
+          audioPlayback.value.playbackRate.value =
+            chooseNearest(props.speed, playbackRates) || 1;
         }
       }
     );
@@ -323,10 +378,24 @@ export default defineComponent({
     align-items: center;
     margin-right: -6px;
     margin-left: 8px;
+    position: relative;
+    font-weight: bold;
 
     &:disabled {
       background-color: var(--qa-color-disabled);
     }
+  }
+
+  .qa-ap-rate-text {
+    letter-spacing: -0.13em;
+  }
+
+  .qa-ap-rate-decimal {
+    font-size: 0.7em;
+    line-height: 1em;
+    position: relative;
+    bottom: 0.3em;
+    margin-right: 0.1em;
   }
 
   .qa-ap-progress {

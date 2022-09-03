@@ -64,4 +64,25 @@ export class AudioDb {
       await this.db.removeItem(key);
     }
   }
+
+  public static async clearAllAudio() {
+    for (const key of await this.db.keys()) {
+      await this.db.removeItem(key);
+    }
+  }
+
+  public static async calculateStorageUsed() {
+    const items: Record<string, IDbAudio> = await this.db.getItems();
+
+    let size = 0;
+    for (const key in items) {
+      const audio = items[key];
+      size += audio.audio.data.byteLength;
+      size += audio.audio.type.length;
+      size += audio.sessionId.length;
+      size += 8; // adding the 8 bytes for the verseIndex number
+    }
+
+    return size;
+  }
 }

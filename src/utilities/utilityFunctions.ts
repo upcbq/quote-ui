@@ -45,7 +45,7 @@ export function mergeDefault<T extends object>(
 }
 
 export function roundTo(num: number, precision: number) {
-  const mult = 10 ^ precision;
+  const mult = Math.pow(10, precision);
   return Math.round((num + Number.EPSILON) * mult) / mult;
 }
 
@@ -65,4 +65,13 @@ export function generatePlaceholderText(length: number, averageWordLength = 12) 
     dummyText += '█'.repeat(wordLength) + ' ';
   }
   return dummyText.slice(0, length);
+}
+
+export function bytesToHuman(size: number) {
+  const i = size === 0 ? 0 : Math.floor(Math.log(size) / Math.log(1024));
+  return `${roundTo(size / Math.pow(1024, i), 2)} ${['B', 'kB', 'MB', 'GB', 'TB'][i]}`;
+}
+
+export function chooseNearest(value: number, options: number[]) {
+  return [...options].sort((a, b) => Math.abs(value - a) - Math.abs(value - b)).at(0);
 }
