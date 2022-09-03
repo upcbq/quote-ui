@@ -1,5 +1,5 @@
 <template>
-  <button class="qa-button" :class="{ light, pill }">
+  <button class="qa-button" :class="{ light, pill, text }">
     <slot />
   </button>
 </template>
@@ -15,6 +15,10 @@ export default defineComponent({
       default: false,
     },
     pill: {
+      type: Boolean,
+      default: false,
+    },
+    text: {
       type: Boolean,
       default: false,
     },
@@ -44,6 +48,19 @@ export default defineComponent({
 
   &.pill {
     border-radius: 1000px;
+  }
+
+  &.text {
+    background: none;
+    color: inherit;
+    font-size: 1em;
+    padding: 0;
+    opacity: 0.7;
+
+    &:hover {
+      background: none;
+      opacity: 1;
+    }
   }
 
   &:hover {
