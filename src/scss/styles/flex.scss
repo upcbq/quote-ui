@@ -18,8 +18,36 @@
   flex-wrap: nowrap;
 }
 
+.grow-0 {
+  flex-grow: 0;
+}
+
+.grow-1 {
+  flex-grow: 1;
+}
+
 .justify-c {
   justify-content: center;
+}
+
+.justify-e {
+  justify-content: end;
+}
+
+.justify-s {
+  justify-content: start;
+}
+
+.justify-space-b {
+  justify-content: space-between;
+}
+
+.justify-space-a {
+  justify-content: space-around;
+}
+
+.justify-space-e {
+  justify-content: space-evenly;
 }
 
 .align-c {
