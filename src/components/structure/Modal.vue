@@ -4,12 +4,12 @@
       class="qa-modal--bg cursor--pointer"
       @click.prevent="!data?.ignoreBgClick ? $emit('close', data?.id) : () => {}"
     ></div>
-    <div class="qa-modal">
+    <div class="qa-modal" :class="data?.containerClasses">
       <component
         v-if="data?.component"
         :is="data?.component"
         v-bind="data?.componentAttr"
-        v-on="data?.componentListeners"
+        v-on="data?.componentListeners || {}"
         :class="data?.componentClasses"
         @close="$emit('close', data?.id)"
       />

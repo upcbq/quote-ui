@@ -10,6 +10,7 @@ export interface OverlayConfig {
   componentAttr?: Record<string, any>;
   componentListeners?: Record<string, () => void>;
   componentClasses?: Record<string, boolean> | string;
+  containerClasses?: Record<string, boolean> | string;
   closeButton?: boolean;
   zIndex?: number;
   ignoreBgClick?: boolean;

@@ -1,10 +1,10 @@
 <template>
-  <div class="qa-fullscreen-overlay">
+  <div class="qa-fullscreen-overlay" :class="data?.containerClasses">
     <component
       v-if="data?.component"
       :is="data?.component"
       v-bind="data?.componentAttr"
-      v-on="data?.componentListeners"
+      v-on="data?.componentListeners || {}"
       @close="$emit('close', data?.id)"
     />
     <button
