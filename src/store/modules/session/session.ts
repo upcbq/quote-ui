@@ -54,7 +54,14 @@ export const SessionStoreMutations = {
       complete,
     }: { key: keyof SessionState['complete']; complete: SessionState['complete'][number] }
   ) {
-    state.complete[key] = complete;
+    if (complete) {
+      state.complete[key] = {
+        ...complete,
+        index: key,
+      };
+    } else {
+      delete state.complete[key];
+    }
   },
   resetComplete(state: SessionState) {
     state.complete = {};
@@ -136,12 +143,11 @@ export const SessionStoreActions = {
   ) {
     commit('setComplete', {
       key: verseIndex,
-      complete: {
-        ...state.complete[verseIndex],
+      complete: mergeDefault(defaultComplete, state.complete[verseIndex], {
         reviewed: true,
         correct,
         skipped: false,
-      },
+      }),
     });
   },
   skipVerse(
@@ -150,12 +156,23 @@ export const SessionStoreActions = {
   ) {
     commit('setComplete', {
       key: verseIndex,
-      complete: {
-        ...state.complete[verseIndex],
+      complete: mergeDefault(defaultComplete, state.complete[verseIndex], {
         reviewed: false,
         correct: false,
         skipped: true,
-      },
+      }),
+    });
+  },
+  unskipVerse(
+    { commit, state }: ActionContext<SessionState, RootState>,
+    verseIndex: number
+  ) {
+    commit('setComplete', {
+      key: verseIndex,
+      complete: mergeDefault(defaultComplete, state.complete[verseIndex], {
+        index: verseIndex,
+        skipped: false,
+      }),
     });
   },
   shuffle({ commit, getters }: ActionContext<SessionState, RootState>, shuffle: boolean) {
@@ -316,7 +333,8 @@ export const SessionStoreGetters = {
       .reduce((arr, v) => {
         if (
           state.complete[v.index]?.reviewed === false &&
-          state.complete[v.index]?.skipped === false
+          state.complete[v.index]?.skipped === false &&
+          state.complete[v.index]?.recorded === true
         ) {
           arr.push(state.complete[v.index]);
         }
@@ -374,8 +392,11 @@ export const SessionStoreGetters = {
         return arr;
       }, [] as SessionCompleteVerse[])
       .sort((a, b) => a.order - b.order)
-      .map((cv) => limitedVerses.at(cv.index))
-      .filter((ref) => !!ref) as IReference[];
+      .map((cv) => ({
+        ...limitedVerses.at(cv.index),
+        index: cv.index,
+      }))
+      .filter((ref) => !!ref) as Array<IReference & { index: number }>;
   },
   cheats(state: SessionState) {
     return (verseIndex: number) => {

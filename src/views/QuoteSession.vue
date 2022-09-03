@@ -9,7 +9,7 @@
       :style="{ opacity: swipeIndColor ? 0.2 : 0, backgroundColor: swipeIndColor }"
     ></div>
     <div class="qa-qs-settings">
-      <button class="clear-btn qa-qs-skipped-button">
+      <button class="clear-btn qa-qs-skipped-button" @click.prevent="openSkippedOverlay">
         <span class="underline">skipped&nbsp;</span>
         <span>({{ skipped.length }})</span>
       </button>
@@ -63,7 +63,7 @@
 
 <script lang="ts">
 import { useStore } from '@/store/store';
-import { computed, defineComponent, ref, watch } from 'vue';
+import { computed, defineComponent, markRaw, ref, watch } from 'vue';
 import { useRouter } from 'vue-router';
 import { PATH } from '@/router/router';
 import QuizCard from '@/components/atoms/QuizCard.vue';
@@ -72,6 +72,7 @@ import CardStackDisplay from '@/components/molecules/CardStackDisplay.vue';
 import IconButton from '@/components/molecules/IconButton.vue';
 import Toggle from '@/components/form/Toggle.vue';
 import SessionControls from '@/components/molecules/SessionControls.vue';
+import SkippedVerses from '@/components/molecules/SkippedVerses.vue';
 
 export default defineComponent({
   name: 'QuoteSession',
@@ -167,6 +168,16 @@ export default defineComponent({
       }
     }
 
+    function openSkippedOverlay() {
+      store.dispatch('ui/openOverlay', {
+        id: 'skipped-overlay',
+        type: 'modal',
+        component: markRaw(SkippedVerses),
+        containerClasses: 'qa-skipped-verses-overlay',
+        closeButton: true,
+      });
+    }
+
     watch(unreviewed, () => {
       if (
         store.getters['session/unreviewedVerses'].length === 0 &&
@@ -190,6 +201,7 @@ export default defineComponent({
       mode,
       setMode,
       spinner,
+      openSkippedOverlay,
     };
   },
 });
