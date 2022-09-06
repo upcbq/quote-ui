@@ -8,6 +8,9 @@ export class AudioRecorder {
   private mediaRecorder: Mp3MediaRecorder;
   private currentRecording: Blob[];
   public isRecording = ref<boolean>(false);
+  public lengthMs = ref<number>(0);
+  public dateStarted = ref<number>(0);
+  public interval = -1;
 
   private constructor(stream: MediaStream) {
     this.mediaRecorder = new Mp3MediaRecorder(stream, { worker: Mp3RecorderWorker() });
@@ -36,22 +39,36 @@ export class AudioRecorder {
   public start() {
     this.mediaRecorder.start();
     this.isRecording.value = true;
+    this.dateStarted.value = new Date().getTime();
+    this.interval = setInterval(() => {
+      this.lengthMs.value = new Date().getTime() - this.dateStarted.value;
+    }, 1000);
   }
 
   /**
    * Stop recording
    */
-  public async stop(): Promise<{ blob: Blob; url: string; audio: AudioPlayback }> {
+  public async stop(): Promise<{
+    blob: Blob;
+    url: string;
+    audio: AudioPlayback;
+    length: number;
+  }> {
     return new Promise((resolve) => {
       this.mediaRecorder.addEventListener('stop', () => {
         const blob = new Blob(this.currentRecording, { type: 'audio/mp3' });
         const url = URL.createObjectURL(blob);
         const audio = new Audio(url);
+        const length = this.lengthMs.value;
 
         this.currentRecording = [];
 
         this.isRecording.value = false;
-        resolve({ blob, url, audio: new AudioPlayback(audio) });
+        this.dateStarted.value = 0;
+        this.lengthMs.value = 0;
+        clearInterval(this.interval);
+        this.interval = -1;
+        resolve({ blob, url, audio: new AudioPlayback(audio), length });
       });
 
       this.mediaRecorder.stop();

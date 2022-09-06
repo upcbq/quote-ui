@@ -75,3 +75,24 @@ export function bytesToHuman(size: number) {
 export function chooseNearest(value: number, options: number[]) {
   return [...options].sort((a, b) => Math.abs(value - a) - Math.abs(value - b)).at(0);
 }
+
+export function secondsToHuman(secs: number, useMs = false) {
+  const hr = Math.floor(secs / 3600);
+  let min: string | number = Math.floor((secs - hr * 3600) / 60);
+  let sec: string | number = Math.floor(secs - hr * 3600 - min * 60);
+  const ms = secs % 1;
+
+  if (min < 10) {
+    min = `0${min}`;
+  }
+
+  if (sec < 10) {
+    sec = `0${sec}`;
+  }
+
+  if (hr <= 0) {
+    return `${min}:${sec}${useMs ? `.${ms.toFixed(3).substring(2)}` : ''}`;
+  }
+
+  return `${hr}:${min}:${sec}${useMs ? `.${ms.toFixed(3).substring(2)}` : ''}`;
+}

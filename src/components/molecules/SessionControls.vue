@@ -25,12 +25,19 @@
           REC
         </RecordButton>
         <div class="qa-sc-recording" v-else>
-          <RecordButton icon="close" class="qa-sc-recording-cancel" @click.prevent="stop">
-            {{ $mqs.xs ? '' : 'Cancel' }}
-          </RecordButton>
-          <RecordButton icon="check" class="qa-sc-recording-next" @click.prevent="next">
-            {{ $mqs.xs ? '' : 'Next' }}
-          </RecordButton>
+          <div class="flex row nowrap qa-sc-recording-buttons">
+            <RecordButton
+              icon="close"
+              class="qa-sc-recording-cancel"
+              @click.prevent="stop"
+            >
+              {{ $mqs.xs ? '' : 'Cancel' }}
+            </RecordButton>
+            <RecordButton icon="check" class="qa-sc-recording-next" @click.prevent="next">
+              {{ $mqs.xs ? '' : 'Next' }}
+            </RecordButton>
+          </div>
+          <span class="qa-sc-recording-length">{{ recordingLength }}</span>
         </div>
       </Transition>
       <IconButton
@@ -67,6 +74,7 @@ import RecordButton from '@/components/molecules/RecordButton.vue';
 import { AudioRecorder } from '@/services/audio/audioRecorder';
 import { AudioDb } from '@/storage/audio.db';
 import AudioPlayer from './AudioPlayer.vue';
+import { secondsToHuman } from '@/utilities/utilityFunctions';
 
 export default defineComponent({
   name: 'SessionControls',
@@ -187,6 +195,10 @@ export default defineComponent({
       set: (speed: number) => store.commit('session/setPlaybackSpeed', speed),
     });
 
+    const recordingLength = computed(() => {
+      return secondsToHuman((audioRecorder.value?.lengthMs.value || 0) / 1000);
+    });
+
     watch([() => props.currentIndex, () => props.mode], async () => {
       await updateAudioSrc();
     });
@@ -208,6 +220,7 @@ export default defineComponent({
       review,
       autoPlay,
       speed,
+      recordingLength,
     };
   },
 });
@@ -242,9 +255,20 @@ export default defineComponent({
     }
   }
   .qa-sc-recording {
-    display: flex;
-    flex-flow: row nowrap;
+    position: relative;
+  }
+
+  .qa-sc-recording-buttons {
     gap: 10px;
+  }
+
+  .qa-sc-recording-length {
+    font-family: $qa-font-sans;
+    color: var(--qa-color-white--darken-50);
+    position: absolute;
+    top: calc(100% + 5px);
+    left: 50%;
+    transform: translateX(-50%);
   }
 
   .qa-sc-player {
