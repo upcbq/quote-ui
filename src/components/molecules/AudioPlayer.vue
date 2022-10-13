@@ -64,7 +64,15 @@
 
 <script lang="ts">
 import { AudioPlayback } from '@/services/audio/audioPlayback';
-import { computed, defineComponent, onMounted, ref, shallowRef, watch } from 'vue';
+import {
+  computed,
+  defineComponent,
+  onMounted,
+  PropType,
+  ref,
+  shallowRef,
+  watch,
+} from 'vue';
 import IconButton from '@/components/molecules/IconButton.vue';
 import debounce from 'lodash/debounce';
 import { chooseNearest, roundTo } from '@/utilities/utilityFunctions';
@@ -89,6 +97,10 @@ export default defineComponent({
     speed: {
       type: Number,
       default: 1,
+    },
+    state: {
+      type: String as PropType<'play' | 'stop' | 'pause' | 'record' | ''>,
+      default: '',
     },
   },
   emits: {
@@ -314,6 +326,25 @@ export default defineComponent({
         if (props.speed && audioPlayback.value) {
           audioPlayback.value.playbackRate.value =
             chooseNearest(props.speed, playbackRates) || 1;
+        }
+      }
+    );
+
+    watch(
+      () => props.state,
+      () => {
+        switch (props.state) {
+          case 'stop':
+            audioPlayback.value?.stop();
+            break;
+          case 'play':
+            audioPlayback.value?.play();
+            break;
+          case 'pause':
+            audioPlayback.value?.pause();
+            break;
+          default:
+            break;
         }
       }
     );

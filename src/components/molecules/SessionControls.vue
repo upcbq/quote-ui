@@ -58,8 +58,9 @@
         class="qa-sc-player"
         v-model:autoPlay="autoPlay"
         v-model:speed="speed"
+        :state="state"
       />
-      <RecordButton icon="check" class="qa-sc-correct" @click.prevent="review(false)">
+      <RecordButton icon="check" class="qa-sc-correct" @click.prevent="review(true)">
         {{ $mqs.xs ? '' : 'Correct' }}
       </RecordButton>
     </template>
@@ -68,7 +69,16 @@
 
 <script lang="ts">
 import { useStore } from '@/store/store';
-import { computed, defineComponent, onMounted, ref, shallowRef, watch } from 'vue';
+import {
+  computed,
+  defineComponent,
+  onBeforeUnmount,
+  onMounted,
+  PropType,
+  ref,
+  shallowRef,
+  watch,
+} from 'vue';
 import IconButton from '@/components/molecules/IconButton.vue';
 import RecordButton from '@/components/molecules/RecordButton.vue';
 import { AudioRecorder } from '@/services/audio/audioRecorder';
@@ -85,11 +95,15 @@ export default defineComponent({
   },
   props: {
     mode: {
-      type: String,
+      type: String as PropType<'quote' | 'review'>,
     },
     currentIndex: {
       type: Number,
       default: -1,
+    },
+    state: {
+      type: String as PropType<'play' | 'stop' | 'pause' | 'record' | ''>,
+      default: '',
     },
   },
   setup(props, ctx) {
@@ -206,6 +220,34 @@ export default defineComponent({
     onMounted(() => {
       AudioDb.initialize();
       updateAudioSrc();
+    });
+
+    watch(
+      () => props.state,
+      () => {
+        if (props.mode === 'quote') {
+          switch (props.state) {
+            case 'stop':
+              if (audioRecorder.value?.isRecording.value) {
+                audioRecorder.value?.stop();
+              }
+              break;
+            case 'record':
+              if (audioRecorder.value && !audioRecorder.value.isRecording.value) {
+                audioRecorder.value?.start();
+              }
+              break;
+            default:
+              break;
+          }
+        }
+      }
+    );
+
+    onBeforeUnmount(() => {
+      if (audioRecorder.value?.isRecording.value) {
+        audioRecorder.value?.stop();
+      }
     });
 
     return {

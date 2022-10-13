@@ -59,3 +59,13 @@
     flex-basis: 100% !important;
   }
 }
+
+@include media-larger(xs) {
+  .row-md {
+    flex-direction: row;
+  }
+
+  .col-md {
+    flex-direction: col;
+  }
+}

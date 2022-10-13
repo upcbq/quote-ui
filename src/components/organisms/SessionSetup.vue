@@ -14,7 +14,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref } from 'vue';
+import { defineComponent, onMounted, ref } from 'vue';
 import SelectVerseList from '@/components/molecules/SelectVerseList.vue';
 import SelectVerseRange from '@/components/molecules/SelectVerseRange.vue';
 import Card from '@/components/content/Card.vue';
@@ -24,6 +24,7 @@ import Button from '@/components/form/Button.vue';
 import Icon from '@/components/content/Icon.vue';
 import { useRouter } from 'vue-router';
 import { PATH } from '@/router/router';
+import { checkForSession } from '@/setupFunctions/session/session';
 
 export default defineComponent({
   name: 'SessionSetup',
@@ -35,6 +36,7 @@ export default defineComponent({
     const state = ref<'selectVerseList' | 'selectRange'>('selectVerseList');
 
     async function selectVerseList(verseList: VerseListLimitedResponse) {
+      await store.dispatch('session/stopSession');
       store.commit('session/setSelectedVerseListId', verseList._id);
       await store.dispatch('session/fetchVerseList');
       state.value = 'selectRange';
@@ -44,6 +46,10 @@ export default defineComponent({
       store.dispatch('session/startSession', finalVerseIndex);
       router.push(PATH.quote);
     }
+
+    onMounted(() => {
+      checkForSession();
+    });
 
     return {
       state,

@@ -32,18 +32,18 @@ export class AudioDb {
   }
 
   public static async addAudio(dbAudio: IDbAudio) {
-    return this.db.setItem(`${dbAudio.sessionId}-${dbAudio.verseIndex}`, dbAudio);
+    return this.db?.setItem(`${dbAudio.sessionId}-${dbAudio.verseIndex}`, dbAudio);
   }
 
   public static async getAudio(
     sessionId: string,
     verseIndex: number
   ): Promise<IDbAudio | null> {
-    return this.db.getItem(`${sessionId}-${verseIndex}`);
+    return this.db?.getItem(`${sessionId}-${verseIndex}`);
   }
 
   public static async deleteAudio(sessionId: string, verseIndex: number) {
-    return this.db.removeItem(`${sessionId}-${verseIndex}`);
+    return this.db?.removeItem(`${sessionId}-${verseIndex}`);
   }
 
   public static async deleteMultipleAudio(sessionId: string, verseIndexes: number[]) {
@@ -55,24 +55,24 @@ export class AudioDb {
   public static async getAllSessionAudio(
     sessionId: string
   ): Promise<Record<string, IDbAudio>> {
-    return this.db.startsWith(`${sessionId}-`);
+    return this.db?.startsWith(`${sessionId}-`);
   }
 
   public static async deleteSessionAudio(sessionId: string) {
-    const sessionAudio = await this.db.keysStartingWith(`${sessionId}-`);
+    const sessionAudio = await this.db?.keysStartingWith(`${sessionId}-`);
     for (const key of sessionAudio) {
-      await this.db.removeItem(key);
+      await this.db?.removeItem(key);
     }
   }
 
   public static async clearAllAudio() {
-    for (const key of await this.db.keys()) {
-      await this.db.removeItem(key);
+    for (const key of await this.db?.keys()) {
+      await this.db?.removeItem(key);
     }
   }
 
   public static async calculateStorageUsed() {
-    const items: Record<string, IDbAudio> = await this.db.getItems();
+    const items: Record<string, IDbAudio> = await this.db?.getItems();
 
     let size = 0;
     for (const key in items) {

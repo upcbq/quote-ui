@@ -10,7 +10,7 @@
     ></div>
     <div class="qa-qs-settings">
       <button class="clear-btn qa-qs-skipped-button" @click.prevent="openSkippedOverlay">
-        <span class="underline">skipped&nbsp;</span>
+        <span class="underline">skipped</span>&nbsp;
         <span>({{ skipped.length }})</span>
       </button>
       <IconButton icon="settings"></IconButton>
@@ -37,6 +37,7 @@
         class="qa-qs-controls"
         :current-index="activeVerseRef?.index"
         :mode="mode"
+        :state="state"
       ></SessionControls>
     </div>
     <div class="qa-qs-stacks">
@@ -54,7 +55,11 @@
       >
         Unreviewed
       </CardStackDisplay>
-      <CardStackDisplay :verses="complete" class="qa-color-bg-green">
+      <CardStackDisplay
+        :verses="complete"
+        class="qa-color-bg-green"
+        @click.prevent="openCompleteOverlay"
+      >
         Complete
       </CardStackDisplay>
     </div>
@@ -63,7 +68,7 @@
 
 <script lang="ts">
 import { useStore } from '@/store/store';
-import { computed, defineComponent, markRaw, ref, watch } from 'vue';
+import { computed, defineComponent, markRaw, nextTick, ref, watch } from 'vue';
 import { useRouter } from 'vue-router';
 import { PATH } from '@/router/router';
 import QuizCard from '@/components/atoms/QuizCard.vue';
@@ -73,6 +78,7 @@ import IconButton from '@/components/molecules/IconButton.vue';
 import Toggle from '@/components/form/Toggle.vue';
 import SessionControls from '@/components/molecules/SessionControls.vue';
 import SkippedVerses from '@/components/molecules/SkippedVerses.vue';
+import SessionComplete from '@/components/molecules/SessionComplete.vue';
 
 export default defineComponent({
   name: 'QuoteSession',
@@ -100,6 +106,8 @@ export default defineComponent({
 
     const spinner = ref<boolean>(false);
 
+    const state = ref<'play' | 'pause' | 'stop' | 'record' | ''>('');
+
     const unquoted = computed(() => {
       const storeVal = store.getters['session/unquotedVerses'];
       return mode.value === 'quote' ? storeVal.slice(1) : storeVal;
@@ -107,7 +115,7 @@ export default defineComponent({
     const unreviewed = computed(() => {
       const storeVal = store.getters['session/unreviewedVerses'];
       const returnVal = [...storeVal];
-      if (mode.value === 'review') {
+      if (mode.value !== 'review') {
         returnVal.reverse();
       }
       return returnVal.slice(mode.value === 'review' ? 1 : 0);
@@ -119,7 +127,7 @@ export default defineComponent({
       return (
         mode.value === 'quote'
           ? store.getters['session/unquotedVerses']
-          : [...store.getters['session/unreviewedVerses']].reverse()
+          : [...store.getters['session/unreviewedVerses']]
       ).at(0);
     });
     const activeVerseString = computed(() => {
@@ -142,7 +150,10 @@ export default defineComponent({
       return store.getters['session/skippedVerses'];
     });
 
-    function setMode(md: typeof mode.value) {
+    async function setMode(md: typeof mode.value) {
+      if (md !== mode.value) {
+        await stop();
+      }
       if (md === 'quote' && unquoted.value.length) {
         mode.value = md;
       } else if (md === 'review' && unreviewed.value.length) {
@@ -169,12 +180,32 @@ export default defineComponent({
     }
 
     function openSkippedOverlay() {
+      if (skipped.value.length) {
+        store.dispatch('ui/openOverlay', {
+          id: 'skipped-overlay',
+          type: 'modal',
+          component: markRaw(SkippedVerses),
+          containerClasses: 'qa-skipped-verses-overlay',
+          closeButton: true,
+        });
+      }
+    }
+
+    async function openCompleteOverlay() {
+      await stop();
       store.dispatch('ui/openOverlay', {
-        id: 'skipped-overlay',
+        id: 'session-complete-overlay',
         type: 'modal',
-        component: markRaw(SkippedVerses),
-        containerClasses: 'qa-skipped-verses-overlay',
+        component: markRaw(SessionComplete),
+        containerClasses: 'qa-session-complete-overlay',
         closeButton: true,
+      });
+    }
+
+    async function stop() {
+      state.value = 'stop';
+      await nextTick().then(() => {
+        state.value = '';
       });
     }
 
@@ -186,6 +217,7 @@ export default defineComponent({
         setMode('quote');
       }
     });
+
     return {
       unquoted,
       unreviewed,
@@ -197,11 +229,12 @@ export default defineComponent({
       skipped,
       testSwipe,
       swipeIndColor,
-      store,
       mode,
       setMode,
       spinner,
       openSkippedOverlay,
+      openCompleteOverlay,
+      state,
     };
   },
 });

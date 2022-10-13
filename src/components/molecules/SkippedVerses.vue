@@ -32,7 +32,7 @@
 </template>
 
 <script lang="ts">
-import { store } from '@/store/store';
+import { useStore } from '@/store/store';
 import { referenceToString } from '@/utilities/utilityFunctions';
 import { computed } from '@vue/reactivity';
 import { defineComponent, ref } from 'vue';
@@ -42,6 +42,7 @@ export default defineComponent({
   name: 'SkippedVerses',
   props: {},
   setup() {
+    const store = useStore();
     const selected = ref<number[]>([]);
     const skipped = computed(() => {
       return store.getters['session/skippedVerses']
@@ -103,7 +104,6 @@ export default defineComponent({
 
     return {
       skipped,
-      store,
       unskip,
       unskipAll,
       select,

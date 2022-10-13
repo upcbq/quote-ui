@@ -1,11 +1,11 @@
 <template>
   <div class="empty-layout">
-    <div class="test-links">
+    <div class="header-links">
       <router-link
         v-for="link in availableLinks"
         :key="link.to"
         :to="link.to"
-        class="test-link"
+        class="header-link"
         >{{ link.label }}</router-link
       >
     </div>
@@ -21,16 +21,7 @@ import { defineComponent } from 'vue';
 export default defineComponent({
   name: 'EmptyLayout',
   data: () => ({
-    links: [
-      {
-        to: '/record',
-        label: 'recording test',
-      },
-      {
-        to: '/',
-        label: 'home',
-      },
-    ] as Array<{ to: string; label: string }>,
+    links: [] as Array<{ to: string; label: string }>,
   }),
   computed: {
     availableLinks(): Array<{ to: string; label: string }> {
@@ -47,7 +38,7 @@ export default defineComponent({
   display: flex;
   flex-direction: column;
 
-  .test-links {
+  .header-links {
     width: 100%;
     justify-self: flex-start;
     display: flex;
@@ -57,7 +48,7 @@ export default defineComponent({
     justify-content: center;
     padding: 5px 0;
 
-    .test-link:not(:last-child) {
+    .header-link:not(:last-child) {
       margin-right: 10px;
       padding-right: 10px;
       position: relative;
