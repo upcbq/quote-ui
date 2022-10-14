@@ -139,7 +139,7 @@ export default defineComponent({
   }
   .qa-svr-title {
     font-size: 18px;
-    letter-spacing: -0.1;
+    letter-spacing: -0.1em;
     margin-bottom: -10px;
     color: var(--qa-color-border);
   }
