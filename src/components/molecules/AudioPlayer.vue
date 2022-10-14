@@ -303,7 +303,7 @@ export default defineComponent({
       () => {
         if (props.autoPlay && audioPlayback.value) {
           setTimeout(() => {
-            if (props.autoPlay && audioPlayback.value) {
+            if (props.autoPlay && audioPlayback.value && props.src) {
               audioPlayback.value.play();
               ctx.emit('update:autoPlay', false);
             }
