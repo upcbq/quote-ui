@@ -43,7 +43,7 @@ export default defineComponent({
     }
 
     async function selectVerseRange(finalVerseIndex: number) {
-      store.dispatch('session/startSession', finalVerseIndex);
+      store.dispatch('session/startSession', finalVerseIndex + 1);
       router.push(PATH.quote);
     }
 

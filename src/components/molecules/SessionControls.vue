@@ -127,8 +127,10 @@ export default defineComponent({
 
     async function record() {
       try {
-        audioRecorder.value = await AudioRecorder.initialize();
-        audioRecorder.value.start();
+        if (!audioRecorder.value) {
+          audioRecorder.value = new AudioRecorder();
+        }
+        await audioRecorder.value.start();
         ctx.emit('recordStart');
       } catch (e) {
         // Something failed with recording; perhaps an error modal?

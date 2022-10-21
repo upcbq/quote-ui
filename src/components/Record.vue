@@ -55,8 +55,10 @@ export default defineComponent({
 
     const record = async () => {
       try {
-        audioRecorder.value = await AudioRecorder.initialize();
-        audioRecorder.value.start();
+        if (!audioRecorder.value) {
+          audioRecorder.value = new AudioRecorder();
+        }
+        await audioRecorder.value.start();
       } catch (e) {
         console.log(e);
       }
