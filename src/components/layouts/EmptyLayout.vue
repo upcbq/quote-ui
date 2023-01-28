@@ -68,6 +68,11 @@ export default defineComponent({
     width: 100%;
     flex-grow: 1;
     overflow-y: auto;
+    display: flex;
+
+    & > * {
+      flex-grow: 1;
+    }
   }
 }
 </style>

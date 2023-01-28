@@ -242,7 +242,6 @@ export default defineComponent({
 
 <style lang="scss">
 .qa-quote-session {
-  height: 100%;
   width: 100%;
   display: flex;
   flex-direction: column;
@@ -257,6 +256,8 @@ export default defineComponent({
   }
   .qa-qs-card {
     width: 100%;
+    max-width: 50vh;
+    margin: 0 auto;
   }
   .qa-qs-stacks {
     width: 100%;

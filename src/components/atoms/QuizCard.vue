@@ -1,33 +1,34 @@
 <template>
-  <svg class="qa-quiz-card" viewBox="0 0 200 100">
-    <rect x="0" y="0" width="200" height="100"></rect>
-    <foreignObject width="100%" height="100%">
-      <div xmlns="http://www.w3.org/1999/xhtml" class="ref-text-container">
+  <Aspect :aspectRatio="2 / 1" :initialWidth="200" class="qa-quiz-card">
+    <template #default="{ scale }">
+      <div class="qa-qc-bg"></div>
+      <div class="ref-text-container">
         <p
           class="ref-text"
           v-if="refText && (!spinner || !!verseText)"
           :class="{ 'qa-qc-ref--with-verse': !!verseText }"
+          :style="{ lineHeight: `${scale}em` }"
         >
-          {{ refText }}
+          <span :style="{ fontSize: `${scale}em` }">{{ refText }}</span>
         </p>
         <p
           class="verse-text"
           v-if="verseText && !spinner"
-          :style="{ fontSize: `${verseTextFontSize}px` }"
+          :style="{ fontSize: `${verseTextFontSize * scale}px` }"
         >
           {{ verseText }}
         </p>
         <p
           class="verse-text"
           v-if="spinner"
-          :style="{ fontSize: `${verseTextFontSize}px` }"
+          :style="{ fontSize: `${verseTextFontSize * scale}px` }"
         >
           <PlaceholderParagraph :length="120" />
         </p>
         <Spinner class="qa-qc-spinner" v-if="spinner" :delay="0" />
       </div>
-    </foreignObject>
-  </svg>
+    </template>
+  </Aspect>
 </template>
 
 <script lang="ts">
@@ -35,12 +36,14 @@ import { computed, defineComponent } from 'vue';
 import { boundedNumber } from '@/utilities/utilityFunctions';
 import Spinner from '@/components/atoms/Spinner.vue';
 import PlaceholderParagraph from '@/components/structure/PlaceholderParagraph.vue';
+import Aspect from '@/components/atoms/Aspect.vue';
 
 export default defineComponent({
   name: 'QaQuizCard',
   components: {
     Spinner,
     PlaceholderParagraph,
+    Aspect,
   },
   props: {
     verseText: {
@@ -81,16 +84,18 @@ export default defineComponent({
   box-shadow: 0px 6px 8px rgba(0, 0, 0, 0.25);
   width: 50%;
 
-  & > rect {
-    fill: #fff;
+  .qa-qc-bg {
+    background-color: #fff;
+    position: absolute;
+    @include position(0);
   }
 
   .ref-text-container {
     display: flex;
     flex-direction: column;
     justify-content: center;
-    height: 100px;
-    width: 200px;
+    height: 100%;
+    width: 100%;
     position: relative;
   }
 

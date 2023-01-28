@@ -1,12 +1,20 @@
 {
   "name": "upcbq-quote-ui",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "private": true,
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
     "build:production": "vue-cli-service build --mode production",
-    "lint": "vue-cli-service lint"
+    "lint": "vue-cli-service lint",
+    "docker:up": "TAG=latest docker compose -f ./docker/docker-compose.yml up -d",
+    "docker:down": "TAG=latest docker compose -f ./docker/docker-compose.yml down",
+    "docker:build": "TAG=latest docker compose -f ./docker/docker-compose.yml build",
+    "docker:push": "TAG=latest docker compose -f ./docker/docker-compose.yml push",
+    "docker:up:next": "TAG=next docker compose -f ./docker/docker-compose.yml up -d",
+    "docker:down:next": "TAG=next docker compose -f ./docker/docker-compose.yml down",
+    "docker:build:next": "TAG=next docker compose -f ./docker/docker-compose.yml build",
+    "docker:push:next": "TAG=next docker compose -f ./docker/docker-compose.yml push"
   },
   "dependencies": {
     "@material/elevation": "^13.0.0",

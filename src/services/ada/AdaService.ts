@@ -44,6 +44,9 @@ export class AdaService {
    * @description On a focus in the body add the necessary class to the focused element
    */
   private handleBodyFocusIn(event: Event): void {
+    document.body.classList.remove(ADA_CONSTANTS.CLASSES.KEYBOARD_FOCUS);
+    document.body.classList.remove(ADA_CONSTANTS.CLASSES.MOUSE_FOCUS);
+    document.body.classList.add(`${this.lastInput}-focus`);
     const element = event.target;
     if (element instanceof HTMLElement) {
       let el = element;
@@ -60,6 +63,9 @@ export class AdaService {
    * @description On a focus out in the body remove the class from the element
    */
   private handleBodyFocusOut(event: Event): void {
+    document.body.classList.remove(ADA_CONSTANTS.CLASSES.KEYBOARD_FOCUS);
+    document.body.classList.remove(ADA_CONSTANTS.CLASSES.MOUSE_FOCUS);
+    document.body.classList.add(`${this.lastInput}-focus`);
     const element = event.target;
     if (element instanceof HTMLElement) {
       let el = element;

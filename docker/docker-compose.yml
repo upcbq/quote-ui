@@ -5,12 +5,10 @@ services:
     build:
       context: ../
       dockerfile: ./docker/node/Dockerfile
-      args:
-        PORT: ${PORT}
-    image: quoteui
+    image: registry.docker.upcbq.com:443/quoteui:${TAG:-latest}
     container_name: quoteui
     restart: unless-stopped
     ports:
-      - ${PORT}:80
+      - ${PORT:-8080}:80
     environment:
       - PORT
