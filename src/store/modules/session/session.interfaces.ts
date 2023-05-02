@@ -24,6 +24,7 @@ export interface SessionOptions {
   autoAdvance: boolean;
   batchSize: number;
   playbackSpeed: number;
+  coachMode: boolean;
 }
 
 export interface SessionState {
@@ -35,6 +36,7 @@ export interface SessionState {
   options: SessionOptions;
   id: string;
   organization: string;
+  displayText: boolean;
 }
 
 type SessionNamespace<N extends string> = `session/${N}`;

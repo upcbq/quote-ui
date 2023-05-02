@@ -18,10 +18,12 @@ export const SessionStoreState: () => SessionState = () => ({
   order: [],
   shuffle: false,
   organization: '',
+  displayText: false,
   options: {
     autoAdvance: false,
     batchSize: -1,
     playbackSpeed: 1,
+    coachMode: false,
   },
   id: '',
 });
@@ -54,7 +56,10 @@ export const SessionStoreMutations = {
     {
       key,
       complete,
-    }: { key: keyof SessionState['complete']; complete: SessionState['complete'][number] }
+    }: {
+      key: keyof SessionState['complete'];
+      complete: SessionState['complete'][number];
+    }
   ) {
     if (complete) {
       state.complete[key] = {
@@ -98,6 +103,15 @@ export const SessionStoreMutations = {
   ) {
     state.options.playbackSpeed = playbackSpeed;
   },
+  setCoachMode(state: SessionState, coachMode: SessionState['options']['coachMode']) {
+    state.options.coachMode = coachMode;
+    if (!coachMode) {
+      state.displayText = false;
+    }
+  },
+  setDisplayText(state: SessionState, displayText: SessionState['displayText']) {
+    state.displayText = displayText;
+  },
 };
 
 export const SessionStoreActions = {
@@ -126,7 +140,7 @@ export const SessionStoreActions = {
     { state, commit, getters }: ActionContext<SessionState, RootState>,
     verseIndex: number
   ) {
-    const cheats: VerseCheat[] = getters.cheats || [];
+    const cheats: VerseCheat[] = getters.cheats(verseIndex) || [];
     const cheatsWithoutReplace = cheats.filter((c) => c.type !== 'replace');
     const replaceCheat = cheats.find((c) => c.type === 'replace') || {
       type: 'replace',
@@ -139,6 +153,9 @@ export const SessionStoreActions = {
       complete: mergeDefault(defaultComplete, state.complete[verseIndex], {
         recorded: false,
         cheats: [...cheatsWithoutReplace, replaceCheat],
+        correct: undefined,
+        skipped: false,
+        reviewed: false,
       }),
     });
   },
@@ -146,12 +163,16 @@ export const SessionStoreActions = {
     { commit, state }: ActionContext<SessionState, RootState>,
     { verseIndex, correct }: { verseIndex: number; correct: boolean }
   ) {
+    const order = state.complete[verseIndex]?.order || Object.keys(state.complete).length;
     commit('setComplete', {
       key: verseIndex,
       complete: mergeDefault(defaultComplete, state.complete[verseIndex], {
+        index: verseIndex,
+        recorded: true,
         reviewed: true,
         correct,
         skipped: false,
+        order,
       }),
     });
   },

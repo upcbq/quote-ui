@@ -1,4 +1,4 @@
-# gift-list-ui-vue3
+# upcbq quote-ui
 
 ## Project setup
 ```

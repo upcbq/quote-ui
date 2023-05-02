@@ -17,12 +17,21 @@
           </div>
         </div>
         <div class="grow-1 flex col" v-if="incorrectVerses.length">
-          <p>incorrect ({{ incorrectVerses.length }})</p>
+          <div class="flex row justify-space-b">
+            <p>incorrect ({{ incorrectVerses.length }})</p>
+            <button
+              @click.prevent="replaceAll(incorrectVerses)"
+              class="clear-btn qa-qs-skipped-button underline cursor--pointer"
+            >
+              replace all
+            </button>
+          </div>
           <div class="qa-sc-av-list grow-1">
             <p
-              class="qa-sc-av-list-item"
+              class="qa-sc-av-list-item cursor--pointer qa-sc-av-incorrect"
               v-for="verse in incorrectVerses"
               :key="verse.index"
+              @click.prevent="replace(verse)"
             >
               {{ reference(verse) }}
             </p>
@@ -55,6 +64,7 @@ import Button from '@/components/form/Button.vue';
 import VerseCompleteGraph from '@/components/molecules/VerseCompleteGraph.vue';
 import { useRouter } from 'vue-router';
 import { PATH } from '@/router/router';
+import { IReference } from '@/api/types';
 
 export default defineComponent({
   name: 'SessionComplete',
@@ -110,12 +120,22 @@ export default defineComponent({
       ];
     });
 
+    function replace(verse: IReference & { index: number }) {
+      store.dispatch('session/unquoteVerse', verse.index);
+    }
+
+    function replaceAll(verses: Array<IReference & { index: number }>) {
+      verses.forEach(replace);
+    }
+
     return {
       endSession,
       correctVerses,
       incorrectVerses,
       incompleteVerses,
       reference: referenceToString,
+      replace,
+      replaceAll,
     };
   },
   components: { Button, VerseCompleteGraph },
@@ -161,6 +181,27 @@ export default defineComponent({
 
   .qa-sc-all-verses {
     min-height: 0;
+  }
+
+  .qa-sc-av-incorrect {
+    position: relative;
+    &::after {
+      content: 'replace';
+      pointer-events: none;
+      opacity: 0;
+      background-color: var(--qa-color-primary);
+      color: var(--qa-color-white);
+      text-decoration: underline;
+      position: absolute;
+      @include position(0);
+      text-align: left;
+      transition: opacity 0.1s ease-in-out;
+    }
+    &:hover {
+      &::after {
+        opacity: 0.7;
+      }
+    }
   }
 
   @include media-larger(xs) {

@@ -12,9 +12,10 @@
         @click.prevent="shuffle = !shuffle"
         :title="`turn shuffle ${shuffle ? 'off' : 'on'}`"
         :disabled="isRecording"
+        v-if="!(coachMode && displayText)"
       >
       </IconButton>
-      <Transition name="fade" mode="out-in">
+      <Transition name="fade" mode="out-in" v-if="!coachMode">
         <RecordButton
           icon="fiber_manual_record"
           class="qa-sc-rec-button"
@@ -40,10 +41,36 @@
           <span class="qa-sc-recording-length">{{ recordingLength }}</span>
         </div>
       </Transition>
+      <template v-else>
+        <RecordButton
+          icon="close"
+          class="qa-sc-incorrect"
+          @click.prevent="review(false)"
+          v-if="displayText"
+        >
+          {{ $mqs.xs ? '' : 'Incorrect' }}
+        </RecordButton>
+        <RecordButton
+          icon="refresh"
+          class="qa-sc-flip"
+          @click.prevent="displayText = !displayText"
+        >
+          {{ $mqs.xs ? '' : 'Flip' }}
+        </RecordButton>
+        <RecordButton
+          icon="check"
+          class="qa-sc-correct"
+          @click.prevent="review(true)"
+          v-if="displayText"
+        >
+          {{ $mqs.xs ? '' : 'Correct' }}
+        </RecordButton>
+      </template>
       <IconButton
         @click.prevent="skip(currentIndex)"
         icon="skip_next"
         title="skip current verse"
+        v-if="!(coachMode && displayText)"
         :disabled="isRecording"
       >
       </IconButton>
@@ -252,6 +279,12 @@ export default defineComponent({
       }
     });
 
+    const coachMode = computed(() => store.state.session.options.coachMode);
+    const displayText = computed({
+      get: () => store.state.session.displayText,
+      set: (value: boolean) => store.commit('session/setDisplayText', value),
+    });
+
     return {
       shuffle,
       skip,
@@ -265,6 +298,8 @@ export default defineComponent({
       autoPlay,
       speed,
       recordingLength,
+      coachMode,
+      displayText,
     };
   },
 });
@@ -320,7 +355,8 @@ export default defineComponent({
   }
 
   .qa-sc-incorrect,
-  .qa-sc-correct {
+  .qa-sc-correct,
+  .qa-sc-flip {
     font-size: 24px;
     .qa-rb-text {
       font-size: 0.7em;
@@ -336,6 +372,12 @@ export default defineComponent({
   .qa-sc-correct {
     --qa-record-button-color: var(--qa-color-white);
     --qa-record-button-bg-color: var(--qa-color-green);
+    --qa-record-button-font-color: var(--qa-color-white);
+  }
+
+  .qa-sc-flip {
+    --qa-record-button-color: var(--qa-color-white);
+    --qa-record-button-bg-color: var(--qa-color-primary);
     --qa-record-button-font-color: var(--qa-color-white);
   }
 

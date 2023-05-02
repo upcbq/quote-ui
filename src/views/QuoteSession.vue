@@ -6,14 +6,17 @@
   >
     <div
       class="qa-qs-swipe-overlay"
-      :style="{ opacity: swipeIndColor ? 0.2 : 0, backgroundColor: swipeIndColor }"
+      :style="{
+        opacity: swipeIndColor ? 0.2 : 0,
+        backgroundColor: swipeIndColor,
+      }"
     ></div>
     <div class="qa-qs-settings">
       <button class="clear-btn qa-qs-skipped-button" @click.prevent="openSkippedOverlay">
         <span class="underline">skipped</span>&nbsp;
         <span>({{ skipped.length }})</span>
       </button>
-      <IconButton icon="settings"></IconButton>
+      <IconButton icon="settings" @click.prevent="openSettingsOverlay"></IconButton>
     </div>
     <div class="qa-qs-display">
       <div class="qa-qs-top-controls">
@@ -52,6 +55,7 @@
         :verses="unreviewed"
         class="qa-color-bg-yellow"
         @click.prevent="setMode('review')"
+        v-if="!coachMode"
       >
         Unreviewed
       </CardStackDisplay>
@@ -79,6 +83,7 @@ import Toggle from '@/components/form/Toggle.vue';
 import SessionControls from '@/components/molecules/SessionControls.vue';
 import SkippedVerses from '@/components/molecules/SkippedVerses.vue';
 import SessionComplete from '@/components/molecules/SessionComplete.vue';
+import SessionSettings from '@/components/molecules/SessionSettings.vue';
 
 export default defineComponent({
   name: 'QuoteSession',
@@ -135,7 +140,7 @@ export default defineComponent({
     });
     const activeVerseText = computed(() => {
       return (
-        (mode.value === 'review' &&
+        ((mode.value === 'review' || displayText.value) &&
           activeVerseRef.value &&
           store.getters['verse/verses'](activeVerseRef.value) &&
           store.getters['verse/verses'](activeVerseRef.value).text) ||
@@ -202,6 +207,17 @@ export default defineComponent({
       });
     }
 
+    async function openSettingsOverlay() {
+      await stop();
+      store.dispatch('ui/openOverlay', {
+        id: 'session-settings-overlay',
+        type: 'modal',
+        component: markRaw(SessionSettings),
+        containerClasses: 'qa-session-settings-overlay',
+        closeButton: true,
+      });
+    }
+
     async function stop() {
       state.value = 'stop';
       await nextTick().then(() => {
@@ -217,6 +233,25 @@ export default defineComponent({
         setMode('quote');
       }
     });
+
+    const displayText = computed(() => store.state.session.displayText);
+
+    const coachMode = computed(() => store.state.session.options.coachMode);
+
+    watch(
+      [displayText, coachMode, activeVerseString],
+      () => {
+        if (displayText.value && coachMode.value && !activeVerseText.value) {
+          spinner.value = true;
+          store
+            .dispatch('verse/fetchVerses', store.getters['session/unquotedVerses'])
+            .then(() => {
+              spinner.value = false;
+            });
+        }
+      },
+      { immediate: true }
+    );
 
     return {
       unquoted,
@@ -234,7 +269,10 @@ export default defineComponent({
       spinner,
       openSkippedOverlay,
       openCompleteOverlay,
+      openSettingsOverlay,
       state,
+      displayText,
+      coachMode,
     };
   },
 });
