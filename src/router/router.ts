@@ -6,6 +6,7 @@ export const PATH = {
   home: '/',
   quote: '/quote-session',
   record: '/record',
+  viewCard: '/ref',
 };
 
 export const routes: Array<RouteRecordRaw> = [
@@ -23,6 +24,14 @@ export const routes: Array<RouteRecordRaw> = [
     component: () => import(/* webpackChunkName "quote" */ '@/views/QuoteSession.vue'),
     meta: {
       layout: 'empty',
+    },
+  },
+  {
+    path: PATH.viewCard,
+    name: 'Reference',
+    component: () => import(/* webpackChunkName "quote" */ '@/views/RefCard.vue'),
+    meta: {
+      layout: 'truly-empty',
     },
   },
   {

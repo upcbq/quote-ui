@@ -54,6 +54,17 @@
   align-items: center;
 }
 
+@for $i from 1 through 3 {
+  .gap-#{$i * 10} {
+    gap: #{$i * 10}px;
+  }
+}
+@for $i from 1 through 9 {
+  .gap-0#{$i} {
+    gap: #{$i}px;
+  }
+}
+
 @include media-smaller(xs) {
   .col-xs-full {
     flex-basis: 100% !important;

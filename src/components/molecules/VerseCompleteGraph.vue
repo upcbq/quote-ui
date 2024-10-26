@@ -44,7 +44,7 @@ import { IReference } from '@/api/types';
 import { SessionCompleteVerse } from '@/store/modules/session/session.interfaces';
 import { useStore } from '@/store/store';
 import { referenceToString } from '@/utilities/utilityFunctions';
-import { computed, ref } from '@vue/reactivity';
+import { computed, ref } from 'vue';
 import { defineComponent } from 'vue';
 import TabRadio from '@/components/form/TabRadio.vue';
 

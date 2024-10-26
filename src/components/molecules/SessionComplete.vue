@@ -58,7 +58,7 @@
 <script lang="ts">
 import { useStore } from '@/store/store';
 import { referenceToString } from '@/utilities/utilityFunctions';
-import { computed } from '@vue/reactivity';
+import { computed } from 'vue';
 import { defineComponent } from 'vue';
 import Button from '@/components/form/Button.vue';
 import VerseCompleteGraph from '@/components/molecules/VerseCompleteGraph.vue';

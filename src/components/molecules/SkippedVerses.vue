@@ -34,7 +34,7 @@
 <script lang="ts">
 import { useStore } from '@/store/store';
 import { referenceToString } from '@/utilities/utilityFunctions';
-import { computed } from '@vue/reactivity';
+import { computed } from 'vue';
 import { defineComponent, ref } from 'vue';
 import Button from '@/components/form/Button.vue';
 

@@ -18,7 +18,7 @@
 </template>
 
 <script lang="ts">
-import { computed } from '@vue/reactivity';
+import { computed } from 'vue';
 import { defineComponent, nextTick, onMounted, PropType, ref } from 'vue';
 
 let tabRadioCount = 0;

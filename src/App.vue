@@ -10,11 +10,13 @@ import { computed, defineComponent } from 'vue';
 import { useRoute } from 'vue-router';
 import EmptyLayout from '@/components/layouts/EmptyLayout.vue';
 import Overlays from '@/components/structure/Overlays.vue';
+import TrulyEmptyLayout from '@/components/layouts/TrulyEmptyLayout.vue';
 
 export default defineComponent({
   name: 'App',
   components: {
     EmptyLayout,
+    TrulyEmptyLayout,
     Overlays,
   },
   setup() {

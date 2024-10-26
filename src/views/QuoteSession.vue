@@ -84,6 +84,7 @@ import SessionControls from '@/components/molecules/SessionControls.vue';
 import SkippedVerses from '@/components/molecules/SkippedVerses.vue';
 import SessionComplete from '@/components/molecules/SessionComplete.vue';
 import SessionSettings from '@/components/molecules/SessionSettings.vue';
+import { MessageService } from '@/services/message/message';
 
 export default defineComponent({
   name: 'QuoteSession',
@@ -237,6 +238,13 @@ export default defineComponent({
     const displayText = computed(() => store.state.session.displayText);
 
     const coachMode = computed(() => store.state.session.options.coachMode);
+
+    watch(activeVerseRef, () => {
+      MessageService.sendMessage({
+        type: 'activeVerseUpdate',
+        value: activeVerseRef.value,
+      });
+    });
 
     watch(
       [displayText, coachMode, activeVerseString],
